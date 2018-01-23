@@ -6,4 +6,8 @@
  * Time: 17:55
  */
 
-echo "GoGoGo";
+require_once '../config/config.php';
+require_once TWIG_DIR.'Autoloader.php';
+Twig_Autoloader::register();
+include_once CORE_DIR.'Autoload.php';
+Route::start();

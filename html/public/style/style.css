@@ -356,7 +356,8 @@ ul.rightNav li a:hover {
 }
 /*Подвал*/
 .footer {
-
+	position: absolute;
+	bottom: 0;
 }
 
 .footer p {

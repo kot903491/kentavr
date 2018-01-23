@@ -15,9 +15,19 @@ define ('CORE_DIR',SITE_ROOT.'core'._DS);//папка родительских �
 define ('CONTROLLER_DIR',SITE_ROOT.'controller'._DS);//папка контроллеров
 define ('MODEL_DIR',SITE_ROOT.'model'._DS);//папка моделей
 define ('VIEW_DIR',SITE_ROOT.'view'._DS);//папка вьюшек
+define ('TWIG_DIR',SITE_ROOT.'Twig'._DS);
+define ('CLASS_DIR',SITE_ROOT.'classes'._DS);
 
 
 //Переменные расположения для html
 define('SITE_DIR',_DS.'public'._DS);//корень html
 define('STYLE_DIR',SITE_DIR.'style'._DS);//папка css
 define('IMAGE_DIR',SITE_DIR.'image'._DS);//папка с изображениями
+
+
+//Переменные SQL
+define('SQL_SERVER','localhost');
+define('SQL_USER','root');
+define('SQL_PASS','qwerty');
+define('SQL_PORT','3306');
+define ('SQL_DBNAME','kentavr');

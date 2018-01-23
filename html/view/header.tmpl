@@ -1,0 +1,19 @@
+<div class="header">
+    <div class="logo"><a href="">Завод <span class="black">Кентавр</span>
+            <span class="gray">г.Кандыагаш</span></a>
+        <p>Производитель лучшего спирта и барды</p>
+    </div>
+    <ul class="nav">
+
+        {% for menu in m_head  %}
+
+        <li><a href="{{ menu.url }}">{{ menu.caption }}</a></li>
+
+        {% endfor %}
+        <!--<li><a href="#">Телефонный справочник</a></li>
+        <li><a href="#">Почтовые номера</a></li>
+        <li><a href="#">Work</a></li>
+        <li><a href="#">News</a></li>
+        <li><a href="#">Contacts</a></li>-->
+    </ul>
+</div>
