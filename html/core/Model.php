@@ -15,5 +15,9 @@ abstract class Model
         $this->data['tmpl']='main.tmpl';
         $this->data['title']='Кентавр';
         $this->data['css']=STYLE_DIR.'style.css';
+        $this->data['l']=false;
+        $this->data['login']=false;
+        $this->data['right']=true;
+        $this->data['m_right'] = Menu::getRight();
     }
 }

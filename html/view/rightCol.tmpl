@@ -1,0 +1,14 @@
+<div class="rightCol">
+    {% if m_right %}
+        <ul class="rightNav">
+            {% for menu in m_right %}
+                <li><a href="{{ menu.url }}">{{ menu.caption }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div class="block">
+        <h3>Это какое то веселое поле</h3>
+        <p><i>Может быть уберу к ебеням, или вкачу сюда какую нибудь плюшку</i></p>
+        <p><a href="#" class="more">Read more »</a></p>
+    </div>
+</div>

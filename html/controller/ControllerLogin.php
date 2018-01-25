@@ -2,15 +2,15 @@
 /**
  * Created by PhpStorm.
  * User: timurka
- * Date: 23.01.18
- * Time: 19:48
+ * Date: 25.01.18
+ * Time: 22:57
  */
 
-class ControllerMain extends Controller
+class ControllerLogin extends Controller
 {
-    public function actionIndex()
+    function actionIndex()
     {
-        // TODO: Implement Action_Index() method.
+        // TODO: Implement actionIndex() method.
         $page='get'.$this->page;
         if(method_exists($this->model, $page)){
             $data=$this->model->$page();
@@ -18,7 +18,7 @@ class ControllerMain extends Controller
         }
         else{
             // здесь также разумнее было бы кинуть исключение
-            Route::ErrorPage404();
+            echo 'не нашел Model->'. $page;
         }
     }
 }

@@ -81,13 +81,13 @@ input,button,textarea {
 	display: inline-block;
 }
 
-input[type=text],textarea,select {
+input[type=text],[type=password],textarea,select {
 	padding: 5px;
 	height: auto;
 	border: 1px solid #bcbcbc;
 }
 
-input[type=text],textarea,button {
+input[type=text],[type=password],textarea,button {
 	box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
 	-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
 	-moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.15);
@@ -103,7 +103,7 @@ input[type=checkbox],input[type=radio] {
 	float: left;
 }
 
-input[type=text] {
+input[type=password],[type=text] {
 	width: 200px;
 }
 
@@ -263,7 +263,7 @@ ul.nav {
 ul.nav li {
 	float: left;
 	list-style: none;
-	padding: 0 0 0 35px;
+	padding: 0 0 0 25px;
 }
 
 ul.nav li a {
@@ -271,7 +271,7 @@ ul.nav li a {
 	font-weight: bold;
 	color: white;
 	text-decoration: none;
-	padding: 0 0 0 35px;
+	padding: 0 0 0 25px;
 	display: block;
 	color: black;
 }
@@ -362,4 +362,12 @@ ul.rightNav li a:hover {
 
 .footer p {
 	
+}
+
+.none{
+	-moz-user-select: -moz-none;
+	-o-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
 }
