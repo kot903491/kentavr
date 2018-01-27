@@ -19,5 +19,6 @@ RewriteEngine On
 RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !favicon.ico
 RewriteRule ^(.*)$ /public/index.php?q=$1 [QSA,L]
 RewriteCond %{THE_REQUEST}/ ^[A-Z]{3,}\s(.*)/index\.php[NC]

@@ -8,25 +8,31 @@
 
 class ModelLogin extends Model
 {
-    function getIndex()
+    public function getIndex()
     {
+        if(isset($_POST['signIn']))
+        {
+            $this->getLogin();
+        }
         $this->data['m_head']=Menu::getHead();
         $this->data['l']=true;
         $this->data['content'] = 'login.tmpl';
         return $this->data;
     }
 
-    function getLogin()
+    public function getLogout()
     {
-        if (isset($_POST['signIn']))
-        {
-            if($_POST['login']!='' && $_POST['pass']!='')
-            {
-                $login = htmlspecialchars($_POST['login']);
-                $pass = htmlspecialchars($_POST['pass']);
-                User::Login($login,$pass);
+        User::Logout();
+    }
 
-            }
+    private function getLogin()
+    {
+        if ($_POST['login'] != '' && $_POST['pass'] != '')
+        {
+            $login = htmlspecialchars($_POST['login']);
+            $pass = htmlspecialchars($_POST['pass']);
+            User::Login($login, $pass);
         }
     }
+
 }

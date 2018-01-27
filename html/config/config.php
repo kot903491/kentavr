@@ -31,3 +31,7 @@ define('SQL_USER','root');
 define('SQL_PASS','qwerty');
 define('SQL_PORT','3306');
 define ('SQL_DBNAME','kentavr');
+
+
+//соль сайта
+define ('SULT','Y}6H\mp2s4x"FzlQ9je0');

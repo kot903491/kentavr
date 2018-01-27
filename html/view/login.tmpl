@@ -1,4 +1,8 @@
-<form method="post" action="/login/login">
+{% if auth_msg %}
+<h2>{{ auth_msg }}</h2>
+{% endif %}
+
+<form method="post">
     <div class="row">
         <label>Ведите логин</label>
         <input type="text" placeholder="Login" name="login">

@@ -15,9 +15,21 @@ abstract class Model
         $this->data['tmpl']='main.tmpl';
         $this->data['title']='Кентавр';
         $this->data['css']=STYLE_DIR.'style.css';
-        $this->data['l']=false;
-        $this->data['login']=false;
         $this->data['right']=true;
         $this->data['m_right'] = Menu::getRight();
+        if (isset($_SESSION['id'])&&isset($_SESSION['user'])&&isset($_SESSION['role']))
+        {
+            $this->data['auth']=true;
+        }
+        else
+        {
+            $this->data['auth']=false;
+        }
+
+        if (isset($_SESSION['msg']))
+        {
+            $this->data['auth_msg']=$_SESSION['msg'];
+            unset($_SESSION['msg']);
+        }
     }
 }
