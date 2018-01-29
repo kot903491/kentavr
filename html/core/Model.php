@@ -20,6 +20,7 @@ abstract class Model
         if (isset($_SESSION['id'])&&isset($_SESSION['user'])&&isset($_SESSION['role']))
         {
             $this->data['auth']=true;
+            $this->data['user_data']=User::userData($_SESSION['id']);
         }
         else
         {

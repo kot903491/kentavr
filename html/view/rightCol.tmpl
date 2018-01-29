@@ -8,8 +8,8 @@
     {% endif %}
     {% if auth %}
     <div class="block">
-        <h3>Это какое то веселое поле</h3>
-        <p><i>Может быть уберу к ебеням, или вкачу сюда какую нибудь плюшку</i></p>
+        <h3>{{ user_data.fio }}</h3>
+        <p><b>Подразделение: </b>{{ user_data.dept }}</p>
         <p><a href="#" class="more">Read more »</a></p>
     </div>
     {% endif %}

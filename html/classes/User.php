@@ -73,6 +73,12 @@ class User
         }
     }
 
+    static public function userData($id)
+    {
+        return User::getUserData((int)$id);
+    }
+
+
 //Приватные свойства
 
 
@@ -208,6 +214,18 @@ class User
             $result=$res['salt'];
         }
         return $result;
+    }
+
+    private static function getUserData($id)
+    {
+        $db=DB::connect();
+        $sql='select users.fio,dept.dept from users
+        inner join dept on dept.id=users.dept
+        where users.id=(?);';
+        $stmt=$db->prepare($sql);
+        $stmt->execute([(int)$id]);
+        $res=$stmt->fetch();
+        return $res;
     }
 
 }
