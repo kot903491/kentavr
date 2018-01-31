@@ -27,13 +27,32 @@ class Menu
         return $result;
     }
 
-    static public function getRight()
+    static public function getRight($i=0)
     {
         $db=DB::connect();
-        $res=$db->query('SELECT caption,url FROM menu_right ORDER BY id ASC');
-        while ($res_i=$res->fetch())
+        $sql='SELECT caption,url FROM menu_right where access=(?) ORDER BY id ASC';
+        $res = $db->prepare($sql);
+        $res->execute([0]);
+        while ($res_i = $res->fetch())
         {
-            $result[]=$res_i;
+            $result[] = $res_i;
+        }
+        if ($i>0)
+        {
+            $sql='SELECT caption,url FROM menu_right where access=(?) ORDER BY id ASC';
+            $res = $db->prepare($sql);
+            $res->execute([99]);
+            while ($res_i = $res->fetch())
+            {
+                $result[] = $res_i;
+            }
+            $sql='SELECT caption,url FROM menu_right where access=(?) ORDER BY id ASC';
+            $res = $db->prepare($sql);
+            $res->execute([$i]);
+            while ($res_i = $res->fetch())
+            {
+                $result[] = $res_i;
+            }
         }
         return $result;
     }

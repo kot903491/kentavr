@@ -16,15 +16,19 @@ abstract class Model
         $this->data['title']='Кентавр';
         $this->data['css']=STYLE_DIR.'style.css';
         $this->data['right']=true;
-        $this->data['m_right'] = Menu::getRight();
+        $this->data['auth_msg']='';
         if (isset($_SESSION['id'])&&isset($_SESSION['user'])&&isset($_SESSION['role']))
         {
             $this->data['auth']=true;
             $this->data['user_data']=User::userData($_SESSION['id']);
+            $this->data['js']['jquery']=JS_DIR.'jquery.js';
+            $this->data['js']['addprov']=JS_DIR.'addProv.js';
+            $this->data['m_right'] = Menu::getRight((int)$_SESSION['role']);
         }
         else
         {
             $this->data['auth']=false;
+            $this->data['m_right'] = Menu::getRight();
         }
 
         if (isset($_SESSION['msg']))

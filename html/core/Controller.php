@@ -18,5 +18,5 @@ abstract class Controller
         $this->view=new View;
         $this->page=$page;
     }
-    abstract function actionIndex();
+    abstract function actionFirst();
 }

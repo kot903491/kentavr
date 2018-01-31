@@ -8,7 +8,7 @@
 
 class ModelMain extends Model
 {
-    public function getIndex()
+    public function getFirst()
     {
         $s='<h1>Основной заголовок</h1>
         <p>Это пример текста, <a href="#" title="link">это пример ссылок</a>, а дальше просто текст-рыба.</p>
@@ -18,7 +18,7 @@ class ModelMain extends Model
             esse cillum dolore eu fugiat nulla pariatur.
             <i title="italic">Excepteur sint occaecat</i> cupidatat non proident,
             sunt in culpa qui officia deserunt.</p><hr>';
-        $this->data['index']=$s;
+        $this->data['content']=$s;
         $this->data['m_head'] = Menu::getHead(1);
         return $this->data;
     }
@@ -27,7 +27,7 @@ class ModelMain extends Model
     {
         $db=DB::connect();
         $res=$db->query('SELECT post,fio,tel FROM phonebook');
-        $result = "<table class='bordered'>
+        $result = "<div class=\"none\"><table class='bordered'>
         <thead>
         <tr>
         <th>Должность/Отдел</th>
@@ -39,8 +39,8 @@ class ModelMain extends Model
         {
             $result.='<tr><td>'.$res_i['post'].'</td><td>'.$res_i['fio'].'</td><td>'.$res_i['tel'].'</td></tr>';
         }
-        $result.='</table>';
-        $this->data['tel']=$result;
+        $result.='</table></div>';
+        $this->data['content']=$result;
         $this->data['m_head'] = Menu::getHead(2);
         return $this->data;
     }
@@ -49,7 +49,7 @@ class ModelMain extends Model
     {
         $db=DB::connect();
         $res=$db->query('SELECT name,number FROM pechkinbook');
-        $result = "<table class='bordered'>
+        $result = "<div class=\"none\"><table class='bordered'>
         <thead>
         <tr>
         <th>Ф.И.О</th>
@@ -60,8 +60,8 @@ class ModelMain extends Model
         {
             $result.='<tr><td>'.$res_i['name'].'</td><td>'.$res_i['number'].'</td></tr>';
         }
-        $result.='</table>';
-        $this->data['pechkin']=$result;
+        $result.='</table></div>';
+        $this->data['content']=$result;
         $this->data['m_head'] = Menu::getHead(3);
         return $this->data;
     }

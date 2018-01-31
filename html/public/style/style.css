@@ -111,37 +111,47 @@ select {
 	width: 210px;
 }
 
-table.order input[type=text] {
-	width: 95%;
-	padding: 5px;
+div#addProv{
+    margin: 5px;
+    padding: 5px;
 }
 
-table.order input{
+div.order input[type=text] {
+	width: 95%;
+	padding: 5px;
+    height: 15px;
+}
+
+div.order input{
 	margin: 0;
 	width: 90%;
-	padding: 3px 0;
+	padding: 5px 0;
 	height: 15px;
 }
 
-table.order{
+div.order{
 	width: 100%;
-	margin: 2px;
+	margin: 2px 0;
 }
-
-table.order td:first-child{
+div.order div{
+    display: inline-block;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+div.order div:first-child{
 	width:35%;
 }
 
-table.order td:last-child{
-    width: 30%;
+div.order div:last-child{
+    width: 27%;
 }
 
-table.order td{
-	padding: 2px;
-
+div.order div{
+	padding: 0;
 }
 
-table.order select {
+div.order select {
 	width: 98%;
 }
 
@@ -151,8 +161,14 @@ table.order select {
 .unit{
     width: 6%;
 }
-.price{
+.cost{
     width: 8%;
+}
+.cur{
+    width: 7.3%;
+}
+.term{
+    width:8.3%;
 }
 
 textarea {
@@ -252,8 +268,10 @@ table.bordered tbody tr:hover {
 	width: 95%;
 	padding: 0 10px;
 	margin: 0 auto;
-	min-height: 100%;
+	height: 100%;
 	position: relative;
+    display: flex;
+    flex-direction: column;
 	
 }
 /*Шапка*/
@@ -261,6 +279,7 @@ table.bordered tbody tr:hover {
 	border-bottom: 13px solid #a12424;
 	padding: 40px 0 0 0;
 	overflow: hidden;
+    flex: 0 0 auto;
 }
 
 .logo {
@@ -330,6 +349,7 @@ ul.nav li a:hover {
 /*Контент*/
 .content {
 	padding: 20px 0;
+    flex: 1 0 auto;
 }
 /*Правая колонка*/
 .rightCol {
@@ -400,8 +420,8 @@ ul.rightNav li a:hover {
 }
 /*Подвал*/
 .footer {
-	position: absolute;
-	bottom: 0;
+    display: block;
+    flex: 0 0 auto;
 }
 
 .footer p {
@@ -414,4 +434,11 @@ ul.rightNav li a:hover {
 	-khtml-user-select: none;
 	-webkit-user-select: none;
 	user-select: none;
+}
+
+#addProv{
+    cursor:pointer;
+}
+#addProv h3:hover{
+    color:#a12424;
 }

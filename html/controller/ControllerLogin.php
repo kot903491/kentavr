@@ -8,7 +8,7 @@
 
 class ControllerLogin extends Controller
 {
-    function actionIndex()
+    function actionFirst()
     {
         // TODO: Implement actionIndex() method.
         $page='get'.$this->page;

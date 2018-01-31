@@ -2,15 +2,15 @@
 /**
  * Created by PhpStorm.
  * User: timurka
- * Date: 23.01.18
- * Time: 19:48
+ * Date: 01.02.18
+ * Time: 2:21
  */
 
-class ControllerMain extends Controller
+class ControllerPage extends Controller
 {
     public function actionFirst()
     {
-        // TODO: Implement Action_Index() method.
+        // TODO: Implement actionFirst() method.
         $page='get'.$this->page;
         if(method_exists($this->model, $page)){
             $data=$this->model->$page();
@@ -20,5 +20,10 @@ class ControllerMain extends Controller
             // здесь также разумнее было бы кинуть исключение
             Route::ErrorPage404();
         }
+    }
+
+    public function actionAdd()
+    {
+        echo var_dump($_POST);
     }
 }

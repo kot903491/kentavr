@@ -3,11 +3,14 @@
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="{{ css }}">
+    {% if js %}
+        <script src="{{ js.jquery }}"></script>
+        <script src="{{ js.addprov }}"></script>
+    {% endif %}
     <title>{{ title }}</title>
 </head>
 <body>
 <div class="wrapper">
-
     {% include 'header.tmpl' %}
     <div class="content">
         {% if right %}
@@ -15,33 +18,13 @@
         {% endif %}
         <div class="main">
 
-            {% if index %}
-            {{ index|raw }}
-                {% include 'order.tmpl' %}
-            {% endif %}
-
-            {% if tel %}
-                <div class="none">
-                {{ tel|raw }}
-                </div>
-            {% endif %}
-
-            {% if pechkin %}
-                <div class="none">
-                    {{ pechkin|raw }}
-                </div>
-            {% endif %}
-
             {% if content %}
-            {% include content %}
+            {{ content|raw }}
             {% endif %}
-
-
 
         </div>
     </div>
     {% include 'footer.tmpl' %}
-
 </div>
 </body>
 </html>

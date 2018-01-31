@@ -19,11 +19,12 @@ define ('TWIG_DIR',SITE_ROOT.'Twig'._DS);
 define ('CLASS_DIR',SITE_ROOT.'classes'._DS);
 
 
+
 //Переменные расположения для html
 define('SITE_DIR',_DS.'public'._DS);//корень html
 define('STYLE_DIR',SITE_DIR.'style'._DS);//папка css
 define('IMAGE_DIR',SITE_DIR.'image'._DS);//папка с изображениями
-
+define ('JS_DIR',_DS.'js'._DS);
 
 //Переменные SQL
 define('SQL_SERVER','localhost');

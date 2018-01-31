@@ -13,8 +13,8 @@ class Route
     {
         // контроллер и действие по умолчанию
         $controller_name = 'Main';
-        $page_name = 'Index';
-        $action='Index';
+        $page_name = 'First';
+        $action='First';
         $routes = explode('/', $_SERVER['REQUEST_URI']);
         // получаем имя контроллера
         if ( !empty($routes[1]) )

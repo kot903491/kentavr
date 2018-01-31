@@ -1,39 +1,50 @@
-<form>
-    <table class="order">
-        <tr>
-            <th>Наименование</th>
-            <th>Кол-во</th>
-            <th>Ед.изм</th>
-            <th>Цена</th>
-            <th>Валюта</th>
-            <th>Срок</th>
-            <th>Примечание</th>
-        </tr>
-        <tr>
-            <td><input type="text"></td>
-            <td class="num"><input type="number"></td>
-            <td class="unit"><select>
+<form method="post" action="/page/addprovision/add">
+    <div class="order">
+        <div><h4>Наименование</h4></div>
+            <div class="num"><h4>Кол-во</h4></div>
+            <div class="unit"><h4>Ед.изм</h4></div>
+            <div class="cost"><h4>Цена</h4></div>
+            <div class="cur"><h4>Валюта</h4></div>
+            <div class="term"><h4>Срок</h4></div>
+            <div><h4>Примечание</h4></div>
+    </div>
+    <div class="order" id="nom0">
+            <div><input type="text" name="data[0]['tovname']" required></div>
+            <div class="num"><input type="number" name="data[0]['qt']" required></div>
+            <div class="unit"><select name="data[0]['unit']">
                     <option>шт</option>
                     <option>кг</option>
                     <option>комплект</option>
                     <option>литр</option>
-                </select></td>
-            <td class="price"><input type="number"></td>
-            <td><select>
+                </select></div>
+            <div class="cost">
+                <input type="number" name="data[0]['cost'] " required></div>
+            <div class="cur"><select name="data[0]['cur']">
                     <option>тенге</option>
                     <option>рубль</option>
                     <option>доллар</option>
                     <option>евро</option>
-                </select></td>
-            <td><select>
+                </select></div>
+            <div class="term"><select name="data[0]['term']">
                     <option>1-3 дня</option>
                     <option>Неделя</option>
                     <option>2 недели</option>
                     <option>Месяц</option>
-                </select></td>
-            <td><input type="text"></td>
-        </tr>
-    </table>
-
-
+                </select></div>
+            <div><input type="text" name="data[0]['note']"></div>
+    </div>
+    <div class="order" id="nom1"></div>
+    <div class="order" id="nom2"></div>
+    <div class="order" id="nom3"></div>
+    <div class="order" id="nom4"></div>
+    <div class="order" id="nom5"></div>
+    <div class="order" id="nom6"></div>
+    <div class="order" id="nom7"></div>
+    <div class="order" id="nom8"></div>
+    <div class="order" id="nom9"></div>
+    <div class="order" id="nom10"></div>
+    <div id="addProv">
+        <h3 onclick="addProv()">+ Добавить еще товар к заявке</h3>
+    </div>
+    <button>Отправить</button>
 </form>
