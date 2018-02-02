@@ -16,7 +16,7 @@ abstract class Model
         $this->data['title']='Кентавр';
         $this->data['css']=STYLE_DIR.'style.css';
         $this->data['right']=true;
-        $this->data['auth_msg']='';
+        $this->data['msg']='';
         if (isset($_SESSION['id'])&&isset($_SESSION['user'])&&isset($_SESSION['role']))
         {
             $this->data['auth']=true;
@@ -33,7 +33,7 @@ abstract class Model
 
         if (isset($_SESSION['msg']))
         {
-            $this->data['auth_msg']=$_SESSION['msg'];
+            $this->data['msg']=$_SESSION['msg'];
             unset($_SESSION['msg']);
         }
     }

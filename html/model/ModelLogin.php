@@ -19,7 +19,7 @@ class ModelLogin extends Model
             $loader = new Twig_Loader_Filesystem($this->data['path']);
             $twig=new Twig_Environment($loader);
             $template=$twig->loadTemplate('login.tmpl');
-            $this->data['content']=$template->render(['auth_msg'=>$this->data['auth_msg']]);
+            $this->data['content']=$template->render(['msg'=>$this->data['msg']]);
 
         }
         catch (Exception $e){

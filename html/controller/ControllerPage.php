@@ -12,7 +12,8 @@ class ControllerPage extends Controller
     {
         // TODO: Implement actionFirst() method.
         $page='get'.$this->page;
-        if(method_exists($this->model, $page)){
+        if(method_exists($this->model, $page))
+        {
             $data=$this->model->$page();
             $this->view->render($data);
         }
@@ -24,6 +25,9 @@ class ControllerPage extends Controller
 
     public function actionAdd()
     {
-        echo var_dump($_POST);
+        if (method_exists($this->model,'add'))
+        {
+            $this->model->add($_POST);
+        }
     }
 }

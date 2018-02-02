@@ -56,21 +56,25 @@ class User
 
     static public function checkLogin()
     {
+        $result=false;
         if (isset($_COOKIE['salt'])&&isset($_SESSION['user']))
         {
             if ($_COOKIE['salt']===User::getUserSalt($_SESSION['id']))
             {
                 User::setSession($_SESSION['user']);
+                $result=true;
             }
             else
             {
                 User::unsetSession();
+
             }
         }
         else
         {
             User::unsetSession();
         }
+        return $result;
     }
 
     static public function userData($id)
@@ -178,7 +182,7 @@ class User
         $stmt=$db->prepare($sql);
         $stmt->execute([$login]);
         $res=$stmt->fetch();
-        setcookie('salt',$res['salt'],(time()+600),'/');
+        setcookie('salt',$res['salt'],(time()+6000),'/');
         $_SESSION['role']=$res['role'];
         $_SESSION['user']=$login;
         $_SESSION['id']=$res['id'];
