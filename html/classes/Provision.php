@@ -52,30 +52,21 @@ class Provision
         $dat = date("y.m.d H:m:s");
         $c=1;
         $d=0;
-        $sql='INSERT INTO provision(`datetime`,`user`,`tovname`,`qt`,`unit`,`cost`,`curr`,`term`,`conf`,`note`) VALUES((?),(?),(?),(?),(?),(?),(?),(?),(?),(?));';
+        $sql='INSERT INTO provision(`datetime`,`user`,`tovname`,`qt`,`unit`,`cost`,`curr`,`term`,`conf`,`note`) VALUES(?,?,?,?,?,?,?,?,?,?);';
         $db->beginTransaction();
         $stmt=$db->prepare($sql);
         foreach ($data as $value) {
-            $stmt->bindParam(1, $dat);
-            $stmt->bindParam(2, $id);
-            $stmt->bindParam(3, $value['tovname']);
-            $stmt->bindParam(4, $value['qt']);
-            $stmt->bindParam(5, $value['unit']);
-            if ($value['cost'] != '') {
-                $stmt->bindParam(6, $value['cost']);
-            } else {
-                $stmt->bindParam(6, $d);
+            if ($value['cost']==''){
+                $value['cost']='0';
             }
-            $stmt->bindParam(7, $value['cur']);
-            $stmt->bindParam(8, $value['term']);
-            $stmt->bindParam(9, $c);
-            $stmt->bindParam(10, $value['note']);
-            $stmt->execute();
-            $id++;
+            $stmt->execute(array($dat,$id,$value['tovname'],$value['qt'],$value['unit'],$value['cost'],
+                $value['cur'],$value['term'],'1',$value['note']));
             $s=$db->lastInsertId();
-            if($s==0){
+
+            if($s==$d){
                 $result=false;
             }
+            $d=$s;
         }
         if ($result){
             $db->commit();
