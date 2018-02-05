@@ -37,4 +37,13 @@ abstract class Model
             unset($_SESSION['msg']);
         }
     }
+
+    protected function control()
+    {
+        if (!User::checkLogin())
+        {
+            header('Refresh: 0; /');
+            exit;
+        }
+    }
 }

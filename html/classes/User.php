@@ -35,11 +35,11 @@ class User
         header('Refresh: 0; /');
     }
 
-    static public function regUser($name,$pass,$role)
+    static public function regUser($name,$pass,$role,$dept,$fio)
     {
         if (!User::findUser($name))
         {
-            User::registerUser($name,$pass,$role);
+            User::registerUser($name,$pass,$role,$dept,$fio);
         }
     }
 
@@ -82,17 +82,13 @@ class User
         return User::getUserData((int)$id);
     }
 
-
-//Приватные свойства
-
-
-    private static function findUser($login)
+    static public function findUser($login)
     {
         $result=false;
         $db=DB::connect();
         $sql='SELECT id FROM users WHERE name=(?);';
         $stmt=$db->prepare($sql);
-        $stmt->execute([$login]);
+        $stmt->execute([strtolower($login)]);
         $res=$stmt->fetch();
         if ($res)
         {
@@ -100,6 +96,34 @@ class User
         }
         return $result;
     }
+
+    static public function getRole()
+    {
+        $result=false;
+        $db=DB::connect();
+        $res=$db->query('SELECT * FROM role;');
+        while($res_i = $res->fetch()){
+            $result[]=$res_i;
+        }
+        return $result;
+    }
+
+    static public function getDept()
+    {
+        $result=false;
+        $db=DB::connect();
+        $res=$db->query('SELECT * FROM dept;');
+        while($res_i = $res->fetch()){
+            $result[]=$res_i;
+        }
+        return $result;
+    }
+
+
+//Приватные свойства
+
+
+
 
     private static function chLogin($l,$p)
     {
@@ -119,17 +143,20 @@ class User
         return $result;
     }
 
-    private static function registerUser($login,$password,$role)
+    private static function registerUser($login,$password,$role,$dept,$fio)
     {
+        $login=strtolower($login);
         $salt=User::generate_password(30);
         $pass=password_hash($password,1);
         $db=DB::connect();
-        $sql='INSERT INTO users(`name`,`pass`,`salt`,`role`) VALUES((?),(?),(?),(?));';
+        $sql='INSERT INTO users(`name`,`pass`,`salt`,`role`,`dept`,`fio`) VALUES((?),(?),(?),(?),(?),(?));';
         $stmt=$db->prepare($sql);
         $stmt->bindParam(1,$login);
         $stmt->bindParam(2,$pass);
         $stmt->bindParam(3,$salt);
         $stmt->bindParam(4,$role);
+        $stmt->bindParam(5,$dept);
+        $stmt->bindParam(6,$fio);
         $stmt->execute();
     }
 

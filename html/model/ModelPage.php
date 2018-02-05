@@ -50,13 +50,4 @@ class ModelPage extends Model
             }
             header('Refresh:0;/page/addprovision');
     }
-
-    private function control()
-    {
-        if (!User::checkLogin())
-        {
-            header('Refresh: 0; /');
-            exit;
-        }
-    }
 }

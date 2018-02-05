@@ -1,0 +1,27 @@
+{% if msg %}
+<h3>{{ msg }}</h3>
+{% endif %}
+
+<form method="post">
+    <label>Введите логин</label>
+    <input type="text" name="uname" placeholder="Укажите логин пользователя" required>
+    <label>Укажите пароль</label>
+    <input type="password" name="pass1" required>
+    <label>Повторите пароль</label>
+    <input type="password" name="pass2" required>
+    <label>Введите ФИО</label>
+    <input type="text" name="fio" placeholder="Укажите ФИО" required>
+    <label>Выберите отдел</label>
+    <select name="dept" required>
+    {% for dept in depts %}
+        <option value="{{ dept.id }}">{{ dept.dept }}</option>
+    {%  endfor %}
+    </select>
+    <label>Выберите роль</label>
+    {% for role in roles %}
+        <label>
+            <input type="radio"name="role" value="{{ role.id }}">{{ role.name }}</label>
+    {%  endfor %}
+    <input type="submit" value="Отправить">
+
+</form>
