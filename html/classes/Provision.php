@@ -61,6 +61,7 @@ class Provision
             }
             $stmt->execute(array($dat,$id,$value['tovname'],$value['qt'],$value['unit'],$value['cost'],
                 $value['cur'],$value['term'],'1',$value['note']));
+            //$s=$stmt->errorInfo();
             $s=$db->lastInsertId();
 
             if($s==$d){
@@ -76,6 +77,28 @@ class Provision
         }
 
 
+        return $result;
+    }
+
+    static public function createConfirmTable()
+    {
+        $result='';
+        $db=DB::connect();
+        $sql='SELECT `order`.id as id,`order`.`datetime`,dept.dept,`order`.tovname,`order`.qt,units.caption as unit,`order`.cost,
+currency.caption as curr,term.caption as term,term.`value` from `order`
+inner join users on users.id=`order`.`user`
+inner join dept on dept.id = users.dept
+inner join units on units.id=`order`.unit
+inner join currency on currency.id=`order`.curr
+inner join term on term.id=`order`.term
+where `order`.conf=1 ORDER BY `order`.`datetime`;';
+        $res=$db->query($sql);
+        while($res_i=$res->fetch())
+        {
+            $result.='<tr><td>'.$res_i['datetime'].'</td><td>'.$res_i['dept'].'</td><td>'.$res_i['tovname'].'</td>';
+            $result.='<td>'.$res_i['qt'].'</td><td>'.$res_i['unit'].'</td><td>'.$res_i['cost'].'</td>';
+            $result.='<td>'.$res_i['curr'].'</td><td>'.$res_i['term'].'</td></tr>';
+        }
         return $result;
     }
 }

@@ -8,16 +8,37 @@
 
 class ModelPage extends Model
 {
-    public function getAddprovision()
+    public function __construct()
     {
+        parent::__construct();
         $this->control();
         $this->data['m_head']=Menu::getHead(99);
+    }
+
+    public function getAddprovision()
+    {
         $data['row']=Provision::addTR();
         $data['msg']=$this->data['msg'];
         try{
             $loader = new Twig_Loader_Filesystem($this->data['path']);
             $twig=new Twig_Environment($loader);
             $template=$twig->loadTemplate('order.tmpl');
+            $this->data['content'] = $template->render($data);
+
+        }
+        catch (Exception $e){
+            die('ERROR: '.$e->getMessage());
+        }
+        return $this->data;
+    }
+
+    public function getAppprovision()
+    {
+        try{
+            $data['table']=Provision::createConfirmTable();
+            $loader = new Twig_Loader_Filesystem($this->data['path']);
+            $twig=new Twig_Environment($loader);
+            $template=$twig->loadTemplate('conforder.tmpl');
             $this->data['content'] = $template->render($data);
 
         }

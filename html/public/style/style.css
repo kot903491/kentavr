@@ -251,6 +251,7 @@ table.bordered th, table.bordered td {
 	border: 1px solid #bcbcbc;
 	padding: 5px;
 	vertical-align: top;
+	min-width: 5%;
 }
 
 table.bordered th {
