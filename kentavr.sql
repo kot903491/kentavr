@@ -26,9 +26,9 @@ DROP TABLE IF EXISTS `confirm`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `confirm` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `caption` varchar(5) NOT NULL,
+  `caption` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,6 +37,7 @@ CREATE TABLE `confirm` (
 
 LOCK TABLES `confirm` WRITE;
 /*!40000 ALTER TABLE `confirm` DISABLE KEYS */;
+INSERT INTO `confirm` VALUES (1,'На согласовании'),(2,'Утвержденно'),(3,'Отменено');
 /*!40000 ALTER TABLE `confirm` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -51,7 +52,7 @@ CREATE TABLE `currency` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `caption` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -60,6 +61,7 @@ CREATE TABLE `currency` (
 
 LOCK TABLES `currency` WRITE;
 /*!40000 ALTER TABLE `currency` DISABLE KEYS */;
+INSERT INTO `currency` VALUES (1,'тенге'),(2,'доллар'),(3,'рубль'),(4,'евро');
 /*!40000 ALTER TABLE `currency` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -125,10 +127,11 @@ CREATE TABLE `menu_right` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `caption` varchar(45) NOT NULL,
   `url` varchar(100) NOT NULL,
+  `access` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `caption_UNIQUE` (`caption`),
   UNIQUE KEY `url_UNIQUE` (`url`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -137,8 +140,56 @@ CREATE TABLE `menu_right` (
 
 LOCK TABLES `menu_right` WRITE;
 /*!40000 ALTER TABLE `menu_right` DISABLE KEYS */;
-INSERT INTO `menu_right` VALUES (4,'Menu 1','#'),(5,'Menu 2','##'),(6,'Menu 3','###');
+INSERT INTO `menu_right` VALUES (1,'Menu 1','#',0),(2,'Menu 2','##',0),(3,'Menu 3','###',0),(7,'Оформить заявку на ТМЦ','/page/addprovision',99),(8,'Создать пользователя','/admin/users/new',1),(9,'Утверждение заявок','/page/appprovision',6);
 /*!40000 ALTER TABLE `menu_right` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `order`
+--
+
+DROP TABLE IF EXISTS `order`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `order` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `datetime` datetime NOT NULL,
+  `user` int(11) NOT NULL,
+  `tovname` varchar(250) NOT NULL,
+  `qt` decimal(10,2) NOT NULL,
+  `unit` int(11) NOT NULL,
+  `cost` decimal(10,2) DEFAULT NULL,
+  `curr` int(11) DEFAULT NULL,
+  `term` int(11) NOT NULL,
+  `conf` int(11) NOT NULL,
+  `note` varchar(100) DEFAULT NULL,
+  `dataconf` date DEFAULT NULL,
+  `qt_prov` decimal(10,2) DEFAULT NULL,
+  `cost_prov` decimal(10,2) DEFAULT NULL,
+  `curr_prov` int(11) DEFAULT NULL,
+  `note_prov` varchar(250) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_provision_unit_idx` (`unit`),
+  KEY `fk_provision_curr_idx` (`curr`),
+  KEY `fk_provision_term_idx` (`term`),
+  KEY `fk_provision_conf_idx` (`conf`),
+  KEY `fk_provision_id` (`user`),
+  CONSTRAINT `fk_provision_conf` FOREIGN KEY (`conf`) REFERENCES `confirm` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_provision_curr` FOREIGN KEY (`curr`) REFERENCES `currency` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_provision_id` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_provision_term` FOREIGN KEY (`term`) REFERENCES `term` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_provision_unit` FOREIGN KEY (`unit`) REFERENCES `units` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order`
+--
+
+LOCK TABLES `order` WRITE;
+/*!40000 ALTER TABLE `order` DISABLE KEYS */;
+INSERT INTO `order` VALUES (1,'2018-02-03 07:02:39',2,'товар 1',1.00,1,0.00,1,1,1,'',NULL,NULL,NULL,NULL,NULL),(7,'2018-02-03 08:02:36',2,'товар 1',1.00,1,0.00,1,1,1,'',NULL,NULL,NULL,NULL,NULL),(9,'2018-02-03 08:02:10',2,'товар 1',1.00,1,0.00,1,1,1,'',NULL,NULL,NULL,NULL,NULL),(17,'2018-02-03 08:02:51',2,'товар 1',5.00,1,0.00,1,1,1,'',NULL,NULL,NULL,NULL,NULL),(18,'2018-02-03 08:02:51',2,'товар 2',55.00,1,0.00,1,1,1,'',NULL,NULL,NULL,NULL,NULL),(19,'2018-02-03 08:02:51',2,'товар 3',5.00,1,0.00,1,1,1,'',NULL,NULL,NULL,NULL,NULL),(20,'2018-02-06 22:02:42',2,'новый товар',1.00,2,100.00,3,4,1,'новый тест',NULL,NULL,NULL,NULL,NULL),(21,'2018-02-07 00:02:25',1,'новый товар админ',5.00,1,50.00,1,1,1,'',NULL,NULL,NULL,NULL,NULL),(22,'2018-02-07 00:02:18',4,'очень очень очень очень очень очень очень очень очень очень очень очень очень очень ',1.00,1,0.00,1,1,1,'',NULL,NULL,NULL,NULL,NULL);
+/*!40000 ALTER TABLE `order` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -193,50 +244,6 @@ INSERT INTO `phonebook` VALUES (1,'Директор','Абдрахманов М�
 UNLOCK TABLES;
 
 --
--- Table structure for table `provision`
---
-
-DROP TABLE IF EXISTS `provision`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `provision` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `datetime` datetime NOT NULL,
-  `dept` int(11) NOT NULL,
-  `tovname` varchar(100) NOT NULL,
-  `qt` int(11) NOT NULL,
-  `unit` int(11) NOT NULL,
-  `cost` decimal(10,2) DEFAULT NULL,
-  `curr` int(11) DEFAULT NULL,
-  `term` int(11) NOT NULL,
-  `status` int(11) DEFAULT NULL,
-  `conf` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_provision_unit_idx` (`unit`),
-  KEY `fk_provision_curr_idx` (`curr`),
-  KEY `fk_provision_dept_idx` (`dept`),
-  KEY `fk_provision_term_idx` (`term`),
-  KEY `fk_provision_stat_idx` (`status`),
-  KEY `fk_provision_conf_idx` (`conf`),
-  CONSTRAINT `fk_provision_conf` FOREIGN KEY (`conf`) REFERENCES `confirm` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_curr` FOREIGN KEY (`curr`) REFERENCES `currency` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_dept` FOREIGN KEY (`dept`) REFERENCES `dept` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_stat` FOREIGN KEY (`status`) REFERENCES `status` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_term` FOREIGN KEY (`term`) REFERENCES `term` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_unit` FOREIGN KEY (`unit`) REFERENCES `units` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `provision`
---
-
-LOCK TABLES `provision` WRITE;
-/*!40000 ALTER TABLE `provision` DISABLE KEYS */;
-/*!40000 ALTER TABLE `provision` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `role`
 --
 
@@ -248,7 +255,7 @@ CREATE TABLE `role` (
   `name` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -257,7 +264,7 @@ CREATE TABLE `role` (
 
 LOCK TABLES `role` WRITE;
 /*!40000 ALTER TABLE `role` DISABLE KEYS */;
-INSERT INTO `role` VALUES (1,'Администратор'),(4,'Заказчик'),(2,'Начальник снабжения'),(5,'Секретарь'),(3,'Снабженец');
+INSERT INTO `role` VALUES (1,'Администратор'),(6,'Главный инженер'),(4,'Заказчик'),(2,'Начальник снабжения'),(5,'Секретарь'),(3,'Снабженец');
 /*!40000 ALTER TABLE `role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -272,7 +279,7 @@ CREATE TABLE `status` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `caption` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -281,6 +288,7 @@ CREATE TABLE `status` (
 
 LOCK TABLES `status` WRITE;
 /*!40000 ALTER TABLE `status` DISABLE KEYS */;
+INSERT INTO `status` VALUES (1,'В обработке снабжения'),(2,'Запущено в работу'),(3,'В доставке'),(4,'Поставлено на склад');
 /*!40000 ALTER TABLE `status` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -296,7 +304,7 @@ CREATE TABLE `term` (
   `caption` varchar(45) NOT NULL,
   `value` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -305,6 +313,7 @@ CREATE TABLE `term` (
 
 LOCK TABLES `term` WRITE;
 /*!40000 ALTER TABLE `term` DISABLE KEYS */;
+INSERT INTO `term` VALUES (1,'1-3 дня',3),(2,'Неделя',7),(3,'2 недели',14),(4,'Месяц',30);
 /*!40000 ALTER TABLE `term` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -319,7 +328,7 @@ CREATE TABLE `units` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `caption` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -328,6 +337,7 @@ CREATE TABLE `units` (
 
 LOCK TABLES `units` WRITE;
 /*!40000 ALTER TABLE `units` DISABLE KEYS */;
+INSERT INTO `units` VALUES (1,'шт'),(2,'кг'),(3,'тонна'),(4,'комплект'),(5,'литр');
 /*!40000 ALTER TABLE `units` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -353,7 +363,7 @@ CREATE TABLE `users` (
   KEY `fk_users_role_idx` (`role`),
   CONSTRAINT `fk_users_dept` FOREIGN KEY (`dept`) REFERENCES `dept` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `fk_users_role` FOREIGN KEY (`role`) REFERENCES `role` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -362,7 +372,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','$2y$10$NG1F7L1WzJWgdJvRelJmh.VNpzgCQEfFTdV2MDTrvt0oiETAOdcTW','S<-/PL[Y)C{b)^b!i>S*not9)OCkX7','',1,1,'Тимур'),(2,'test','$2y$10$Lj6q.nthSj1s7XfdSoI1z.G5PU3Z3IdaFkUw9x3gIWcNUPcyhhBfK','f$J.H1C|r6fac)~r&s+FX[tp%8?|m0',NULL,2,2,'тест');
+INSERT INTO `users` VALUES (1,'admin','$2y$10$NG1F7L1WzJWgdJvRelJmh.VNpzgCQEfFTdV2MDTrvt0oiETAOdcTW','S<-/PL[Y)C{b)^b!i>S*not9)OCkX7','',1,1,'Тимур'),(2,'test','$2y$10$Lj6q.nthSj1s7XfdSoI1z.G5PU3Z3IdaFkUw9x3gIWcNUPcyhhBfK','f$J.H1C|r6fac)~r&s+FX[tp%8?|m0',NULL,2,2,'тест'),(3,'test2','$2y$10$Gy24JvLfnMkAfQ86PXreC.PKouIdbrdENKmt1VLwVzoyTpkkWhbUS','Gok~k?p~K(GGS8hchZ)nIZNS(t9HED',NULL,4,3,'test2'),(4,'test3','$2y$10$r9wGyItpEPZszFLKPp3t7.zpYSv5KRskujKtg45bwQ79Q4f2mOTqq','!,S/.50/4k5aSm81p]o-+YTIgx4[5`',NULL,6,1,'Инженер');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -375,4 +385,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-01-29 23:02:16
+-- Dump completed on 2018-02-07  0:51:34
