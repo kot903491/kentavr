@@ -52,7 +52,7 @@ class Provision
         $dat = date("y.m.d H:m:s");
         $c=1;
         $d=0;
-        $sql='INSERT INTO provision(`datetime`,`user`,`tovname`,`qt`,`unit`,`cost`,`curr`,`term`,`conf`,`note`) VALUES(?,?,?,?,?,?,?,?,?,?);';
+        $sql='INSERT INTO `order`(`datetime`,`user`,`tovname`,`qt`,`unit`,`cost`,`curr`,`term`,`conf`,`note`) VALUES(?,?,?,?,?,?,?,?,?,?);';
         $db->beginTransaction();
         $stmt=$db->prepare($sql);
         foreach ($data as $value) {
