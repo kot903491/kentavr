@@ -251,7 +251,6 @@ table.bordered th, table.bordered td {
 	border: 1px solid #bcbcbc;
 	padding: 5px;
 	vertical-align: top;
-	min-width: 5%;
 }
 
 table.bordered th {
@@ -442,4 +441,17 @@ ul.rightNav li a:hover {
 }
 #addProv h3:hover{
     color:#a12424;
+}
+
+td.date,td.qt,td.cost,td.term {
+	width:6%;
+}
+td.curr,td.unit {
+	width:4.5%;
+}
+td.dept {
+	width:9%;
+}
+td.tovname,td.note {
+	width:25%;
 }
