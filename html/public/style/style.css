@@ -108,7 +108,7 @@ input[type=password],[type=text] {
 }
 
 select {
-	width: 210px;
+	min-width: 30px;
 }
 
 div#addProv{

@@ -30,4 +30,11 @@ class ControllerPage extends Controller
             $this->model->add($_POST);
         }
     }
+    public function actionConfirm()
+    {
+        if (method_exists($this->model,'confirm'))
+        {
+            $this->model->confirm($_POST);
+        }
+    }
 }

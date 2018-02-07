@@ -33,6 +33,7 @@ class User
     {
         User::unsetSession();
         header('Refresh: 0; /');
+        exit;
     }
 
     static public function regUser($name,$pass,$role,$dept,$fio)
@@ -73,6 +74,15 @@ class User
         else
         {
             User::unsetSession();
+        }
+        return $result;
+    }
+
+    static public function checkRole()
+    {
+        $result=true;
+        if (!User::chRole()){
+            $result=false;
         }
         return $result;
     }
@@ -138,6 +148,25 @@ class User
             if (password_verify($p,$res['pass']))
             {
                 $result=true;
+            }
+        }
+        return $result;
+    }
+
+    private static function chRole()
+    {
+        $result=true;
+        if (isset($_SESSION['role'])){
+            $db=DB::connect();
+            $sql='SELECT access FROM menu_right WHERE url=(?);';
+            $stmt=$db->prepare($sql);
+            $stmt->execute([$_SERVER['REQUEST_URI']]);
+            $res=$stmt->fetch();
+            $res=explode(',',$res['access']);
+            foreach($res as $value){
+                if ($value!='0'||$value!='99'|| $value!=$_SESSION['role']){
+                    $result=false;
+                }
             }
         }
         return $result;

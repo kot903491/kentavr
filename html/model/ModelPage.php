@@ -71,4 +71,23 @@ class ModelPage extends Model
             }
             header('Refresh:0;/page/addprovision');
     }
+
+    public function confirm($data)
+    {
+        if (isset($data['conf'])){
+            $dat = date("y.m.d H:m:s");
+            foreach($data['conf'] as $key=>$value){
+                if ($value!=1){
+                    Provision::orderConfirm($key,$value,$dat);
+                }
+            }
+        }
+        $routes=explode('/',$_SERVER['REQUEST_URI']);
+        if (isset($routes[3])){
+            unset($routes[3]);
+        }
+        $url=implode('/',$routes);
+        header('Refresh:0; '.$url);
+        exit;
+    }
 }

@@ -14,6 +14,7 @@ abstract class Model
         $this->data['path']=VIEW_DIR;
         $this->data['tmpl']='main.tmpl';
         $this->data['title']='Кентавр';
+        $this->data['n_css']=STYLE_DIR.'normalize.css';
         $this->data['css']=STYLE_DIR.'style.css';
         $this->data['right']=true;
         $this->data['msg']='';
@@ -45,5 +46,10 @@ abstract class Model
             header('Refresh: 0; /');
             exit;
         }
+        if (!User::checkRole()){
+            Route::ErrorPage404();
+            exit;
+        }
+
     }
 }

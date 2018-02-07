@@ -61,13 +61,10 @@ class Provision
             }
             $stmt->execute(array($dat,$id,$value['tovname'],$value['qt'],$value['unit'],$value['cost'],
                 $value['cur'],$value['term'],'1',$value['note']));
-            //$s=$stmt->errorInfo();
-            $s=$db->lastInsertId();
-
-            if($s==$d){
+            $s=$stmt->errorInfo();
+            if($s[2]!=null){
                 $result=false;
             }
-            $d=$s;
         }
         if ($result){
             $db->commit();
@@ -98,7 +95,7 @@ inner join dept on dept.id = users.dept
 inner join units on units.id=`order`.unit
 inner join currency on currency.id=`order`.curr
 inner join term on term.id=`order`.term
-where `order`.conf=1 ORDER BY `order`.`datetime`;';
+where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         $res=$db->query($sql);
         while($res_i=$res->fetch())
         {
@@ -112,5 +109,14 @@ where `order`.conf=1 ORDER BY `order`.`datetime`;';
 			$result.='</select></tr>';
         }
         return $result;
+    }
+
+    static public function orderConfirm($id,$conf,$date)
+    {
+        $db=DB::connect();
+        $sql='UPDATE `order` SET `conf`=(?),`dateconf`=(?) WHERE `id`=(?);';
+        $stmt=$db->prepare($sql);
+        $stmt->execute([$conf,$date,$id]);
+        $s=$stmt->errorInfo();
     }
 }
