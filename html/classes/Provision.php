@@ -82,10 +82,17 @@ class Provision
 
     static public function createConfirmTable()
     {
+		$db=DB::connect();
+		$sql='SELECT * FROM confirm;';
+		$res=$db->query($sql);
+		while($res_i=$res->fetch())
+		{
+			$conf[$res_i['id']]=$res_i['caption'];
+		}
+		
         $result='';
-        $db=DB::connect();
         $sql='SELECT `order`.id as id,`order`.`datetime`,dept.dept,`order`.tovname,`order`.qt,units.caption as unit,`order`.cost,
-currency.caption as curr,term.caption as term,term.`value` from `order`
+currency.caption as curr,term.caption as term,`order`.note from `order`
 inner join users on users.id=`order`.`user`
 inner join dept on dept.id = users.dept
 inner join units on units.id=`order`.unit
@@ -95,9 +102,14 @@ where `order`.conf=1 ORDER BY `order`.`datetime`;';
         $res=$db->query($sql);
         while($res_i=$res->fetch())
         {
-            $result.='<tr><td>'.$res_i['datetime'].'</td><td>'.$res_i['dept'].'</td><td>'.$res_i['tovname'].'</td>';
-            $result.='<td>'.$res_i['qt'].'</td><td>'.$res_i['unit'].'</td><td>'.$res_i['cost'].'</td>';
-            $result.='<td>'.$res_i['curr'].'</td><td>'.$res_i['term'].'</td></tr>';
+            $result.='<tr><td class="date">'.date('d.m.Y',strtotime($res_i['datetime'])).'</td><td class="dept">'.$res_i['dept'].'</td><td class="tovname">'.$res_i['tovname'].'</td>';
+            $result.='<td class="qt">'.$res_i['qt'].'</td><td class="unit">'.$res_i['unit'].'</td><td class="cost">'.$res_i['cost'].'</td>';
+            $result.='<td class="curr">'.$res_i['curr'].'</td><td class="term">'.$res_i['term'].'</td><td class="note">'.$res_i['note'].'</td><td><select name="conf['.$res_i['id'].']">';
+			foreach($conf as $key=>$value){
+				$result.='<option value='.$key.'>'.$value.'</option>';
+			}
+			
+			$result.='</select></tr>';
         }
         return $result;
     }
