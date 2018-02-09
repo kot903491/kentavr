@@ -119,4 +119,10 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         $stmt->execute([$conf,$date,$id]);
         $s=$stmt->errorInfo();
     }
+
+    static public function createSnabTable()
+    {
+        $db=DB::connect();
+        $sql='SELECT ';
+    }
 }

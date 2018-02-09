@@ -30,28 +30,17 @@ class Menu
     static public function getRight($i=0)
     {
         $db=DB::connect();
-        $sql='SELECT caption,url FROM menu_right where access=(?) ORDER BY id ASC';
+        $sql='SELECT caption,url,access FROM menu_right ORDER BY id ASC';
         $res = $db->prepare($sql);
-        $res->execute([0]);
-        while ($res_i = $res->fetch())
-        {
-            $result[] = $res_i;
-        }
-        if ($i>0)
-        {
-            $sql='SELECT caption,url FROM menu_right where access=(?) ORDER BY id ASC';
-            $res = $db->prepare($sql);
-            $res->execute([99]);
-            while ($res_i = $res->fetch())
-            {
-                $result[] = $res_i;
-            }
-            $sql='SELECT caption,url FROM menu_right where access=(?) ORDER BY id ASC';
-            $res = $db->prepare($sql);
-            $res->execute([$i]);
-            while ($res_i = $res->fetch())
-            {
-                $result[] = $res_i;
+        $res->execute();
+        while ($res_i=$res->fetch()){
+            $access=explode(',',$res_i['access']);
+            foreach($access as $value){
+                if($value=='0'||($value=='99'&&$i>0)||$value==$i){
+                    unset($res_i['access']);
+                    $result[]=$res_i;
+                    break;
+                }
             }
         }
         return $result;

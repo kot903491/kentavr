@@ -57,6 +57,7 @@ class Route
         header('HTTP/1.1 404 Not Found');
         header("Status: 404 Not Found");
         header('Location:'.$host.'404');
+        include VIEW_DIR.'404.html';
     }
 
 }

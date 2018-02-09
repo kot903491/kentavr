@@ -155,18 +155,21 @@ class User
 
     private static function chRole()
     {
-        $result=true;
+
         if (isset($_SESSION['role'])){
+            $url=$_SERVER['REQUEST_URI'];
             $db=DB::connect();
             $sql='SELECT access FROM menu_right WHERE url=(?);';
             $stmt=$db->prepare($sql);
-            $stmt->execute([$_SERVER['REQUEST_URI']]);
+            $stmt->execute([$url]);
             $res=$stmt->fetch();
             $res=explode(',',$res['access']);
             foreach($res as $value){
-                if ($value!='0'||$value!='99'|| $value!=$_SESSION['role']){
+                $result=true;
+                if ($value!='0' && $value!='99' && $value!=$_SESSION['role']){
                     $result=false;
                 }
+
             }
         }
         return $result;
