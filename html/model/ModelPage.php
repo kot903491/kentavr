@@ -93,7 +93,7 @@ class ModelPage extends Model
     public function confirm($data)
     {
         if (isset($data['conf'])){
-            $dat = date("y.m.d H:m:s");
+            $dat = date("Y-m-d");
             foreach($data['conf'] as $key=>$value){
                 if ($value!=1){
                     Provision::orderConfirm($key,$value,$dat);

@@ -113,10 +113,21 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 
     static public function orderConfirm($id,$conf,$date)
     {
-        $db=DB::connect();
-        $sql='UPDATE `order` SET `conf`=(?),`dateconf`=(?) WHERE `id`=(?);';
-        $stmt=$db->prepare($sql);
-        $stmt->execute([$conf,$date,$id]);
+        switch($conf){
+            case 2:
+                $deadline=Provision::deadline($id,$date);
+                $db=DB::connect();
+                $sql='UPDATE `order` SET `conf`=(?),`dateconf`=(?),`deadline`=(?) WHERE `id`=(?);';
+                $stmt=$db->prepare($sql);
+                $stmt->execute([$conf,$date,$deadline,$id]);
+                break;
+            case 3:
+                $db=DB::connect();
+                $sql='UPDATE `order` SET `conf`=(?),`dateconf`=(?) WHERE `id`=(?);';
+                $stmt=$db->prepare($sql);
+                $stmt->execute([$conf,$date,$id]);
+                break;
+        }
         $s=$stmt->errorInfo();
     }
 
@@ -124,5 +135,34 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
     {
         $db=DB::connect();
         $sql='SELECT ';
+    }
+
+
+    private function deadline($id,$date)
+    {
+        $db=DB::connect();
+        $sql='SELECT `term` FROM `order` WHERE `id`=(?);';
+        $stmt=$db->prepare($sql);
+        $stmt->execute([$id]);
+        $res=$stmt->fetch();
+        $term=$res['term'];
+        $res=$db->query('SELECT `id`,`strtotime` FROM term;');
+        while($res_i=$res->fetch()){
+            if($res_i['id']==$term){
+                if($res_i['strtotime']=='3'){
+                    $wday=date('N',strtotime($date));
+                    if ($wday<3){
+                        $result=date('Y.m.d',strtotime('next Friday',strtotime($date)));
+                    }
+                    else{
+                        $result=date('Y.m.d',strtotime('next Wednesday',strtotime($date)));
+                    }
+                }
+                else{
+                    $result=date('Y.m.d',strtotime($res_i['strtotime'],strtotime($date)));
+                }
+            }
+        }
+        return $result;
     }
 }
