@@ -22,8 +22,6 @@ abstract class Model
         {
             $this->data['auth']=true;
             $this->data['user_data']=User::userData($_SESSION['id']);
-            $this->data['js']['jquery']=JS_DIR.'jquery.js';
-            $this->data['js']['addprov']=JS_DIR.'addProv.js';
             $this->data['m_right'] = Menu::getRight((int)$_SESSION['role']);
         }
         else

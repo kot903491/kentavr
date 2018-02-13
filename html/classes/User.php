@@ -122,7 +122,7 @@ class User
     {
         $result=false;
         $db=DB::connect();
-        $res=$db->query('SELECT * FROM dept;');
+        $res=$db->query('SELECT * FROM dept ORDER BY dept ASC;');
         while($res_i = $res->fetch()){
             $result[]=$res_i;
         }

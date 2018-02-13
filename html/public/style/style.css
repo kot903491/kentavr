@@ -260,6 +260,13 @@ table.bordered th {
 	color: black;
 }
 
+tr.click {
+	color:black;
+	font-weight: 600;
+	font-size:12px;
+}
+
+
 table.bordered tbody tr:hover {
 	background-color: #f2f2f2;
 }
@@ -453,5 +460,75 @@ td.dept {
 	width:9%;
 }
 td.tovname,td.note {
-	width:25%;
+	width: 25%;
+}
+
+/*Табы*/
+
+section.tabs {
+	display: block;
+	padding: 20px 0 0;
+	border-top: 1px solid #ddd;
+}
+
+input.tabs {
+	display: none;
+}
+
+label.tabs {
+	display: inline-block;
+	margin: 0 0 -1px;
+	padding: 15px 25px;
+	font-weight: 600;
+	text-align: center;
+	color: #4b4b4b;
+	border: 1px solid transparent;
+}
+
+label.tabs:before {
+	font-family: fontawesome;
+	font-weight: normal;
+	margin-right: 10px;
+}
+
+label.tabs:hover {
+	color: #888;
+	cursor: pointer;
+}
+
+input.tabs:checked + label {
+	color: #000;
+	border: 1px solid #ddd;
+	border-top: 2px solid orange;
+	border-bottom: 4px solid #fff;
+}
+
+@media screen and (max-width: 650px) {
+	label {
+		font-size: 0;
+	}
+	label:before {
+		margin: 0;
+		font-size: 18px;
+	}
+}
+
+@media screen and (max-width: 400px) {
+	label {
+		padding: 15px;
+	}
+}
+.alert{
+	background-color: red;
+}
+
+div#orderTable{
+	display: block;
+	width: 35%;
+	float: left;
+}
+div#tableDetail{
+	display: block;
+	width: 62%;
+	float: right;
 }

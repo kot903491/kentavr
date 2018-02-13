@@ -133,12 +133,77 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 
     static public function createSnabTable()
     {
+        $input='';
         $db=DB::connect();
-        $sql='SELECT ';
+        $res=$db->query('SELECT `deadline` FROM `order` WHERE `conf`=2 GROUP BY `deadline` ORDER BY `deadline` ASC;');
+        while($res_i=$res->fetch()){
+            $dline[]=$res_i['deadline'];
+        }
+        foreach($dline as $key=>$value){
+            $input.=Provision::createInputLabel($key,$value);
+        }
+        $result['input']=$input;
+        return $result;
+
+    }
+
+    public static function createTovTable($value)
+    {
+        $i=0;
+        $section='<table class="bordered"><th>Товар</th><th>Кол-во</th>';
+        $db=DB::connect();
+        $sql='SELECT `tovname`,sum(`qt`) as qt from `order` where `conf`=2 and`deadline`=(?) group by tovname;';
+        $stmt=$db->prepare($sql);
+        $stmt->execute([$value]);
+        $s=$db->errorInfo();
+        while($res_i=$stmt->fetch()){
+            $section.='<tr onclick="getTableDetail(\''.$value.'\',\''.$res_i['tovname'].'\')"><td class="tovname">'.$res_i['tovname'].'</td>';
+            $section.='<td class="qt">'.$res_i['qt'].'</td></tr>';
+            $tov[]=$res_i['tovname'];
+            $i++;
+
+        }
+        $section.='</table>';
+        return $section;
+    }
+
+    public static function getTableDetail($date,$tov){
+        $db=DB::connect();
+        $sql='SELECT `dept`.`dept` as `dept`,sum(`order`.`qt`) as qt,`units`.`caption`as `unit`,MAX(`order`.`cost`) as `cost`,`currency`.`caption` as `curr` from `order`';
+        $sql.='inner join `users` on `users`.`id`=`order`.`user`';
+        $sql.='inner join `dept` on `dept`.`id`=`users`.`dept`';
+        $sql.='inner join `units` on `units`.`id`=`order`.`unit`';
+        $sql.='inner join `currency` on `currency`.`id`=`order`.`curr`';
+        $sql.='where `order`.`conf`=2 and `order`.`deadline`=(?) and `order`.`tovname`=(?) group by dept,unit,curr;';
+        $stmt=$db->prepare($sql);
+            $detail='<table class="bordered">';
+            $detail.='<th>Отдел</th><th>Кол-во</th><th>Ед.изм</th><th>Цена max</th><th>Валюта</th><th>Примечание</th>';
+            $stmt->execute([$date,$tov]);
+            $s=$stmt->errorInfo();
+            while($res_i=$stmt->fetch()){
+                $res=$db->query('SELECT `note` FROM `order` WHERE `tovname`="'.$tov.'" and `deadline`="'.$date.'";');
+                $s=$stmt->errorInfo();
+                while($res_n=$res->fetch()){
+                    if ($res_n['note']!=''){
+                        $note[]=$res_n['note'];
+                    }
+                }
+                if (isset($note)){
+                    $note=implode(',',$note);
+                }
+                $detail.='<tr><td class="dept">'.$res_i['dept'].'</td><td class="qt">'.$res_i['qt'].'</td>';
+                $detail.='<td class="unit">'.$res_i['unit'].'</td><td class="cost">'.round($res_i['cost'],2).'</td>';
+                $detail.='<td class="curr">'.$res_i['curr'].'</td><td class="note">'.$note.'</td></tr>';
+                unset ($note);
+            }
+            $detail.='</table>';
+
+        return $detail;
+
     }
 
 
-    private function deadline($id,$date)
+    private static function deadline($id,$date)
     {
         $db=DB::connect();
         $sql='SELECT `term` FROM `order` WHERE `id`=(?);';
@@ -163,6 +228,23 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
                 }
             }
         }
+        return $result;
+    }
+
+    private static function createInputLabel($key,$value)
+    {
+        $day=date('Y-m-d',strtotime('+3 day'));
+        $class='tabs';
+        if ($day>=$value){
+            $class='tabs alert';
+        }
+        $ch='';
+        if ($key=='0'){
+            $ch=' checked';
+        }
+        $val="'$value'";
+        $result='<input class="tabs" id="tab'.$key.'" type="radio" name="tabs"'.$ch.' onclick="getTovTable('.$val.')">';
+        $result.='<label class="'.$class.'" for="tab'.$key.'">'.$value.'</label>';
         return $result;
     }
 }

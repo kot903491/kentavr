@@ -17,6 +17,8 @@ class ModelPage extends Model
     public function getAddprovision()
     {
         $this->control();
+        $this->data['js']['jquery']=JS_DIR.'jquery.js';
+        $this->data['js']['script']=JS_DIR.'addProv.js';
         $data['row']=Provision::addTR();
         $data['msg']=$this->data['msg'];
         try{
@@ -52,11 +54,13 @@ class ModelPage extends Model
     public function getVieworder()
     {
         $this->control();
+        $this->data['js']['jquery']=JS_DIR.'jquery.js';
+        $this->data['js']['script']=JS_DIR.'viewOrder.js';
         try{
-            $data['table']=Provision::createConfirmTable();
+            $data=Provision::createSnabTable();
             $loader = new Twig_Loader_Filesystem($this->data['path']);
             $twig=new Twig_Environment($loader);
-            $template=$twig->loadTemplate('conforder.tmpl');
+            $template=$twig->loadTemplate('vieworder.tmpl');
             $this->data['content'] = $template->render($data);
 
         }
