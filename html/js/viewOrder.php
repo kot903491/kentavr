@@ -7,9 +7,6 @@
  */
 require_once '../config/config.php';
 require_once '../core/Autoload.php';
-if (isset($_POST['date'])){
-    echo Provision::createTovTable($_POST['date']);
-}
 if (isset($_POST['dat'])&&$_POST['tov']){
     echo Provision::getTableDetail($_POST['dat'],$_POST['tov']);
 }

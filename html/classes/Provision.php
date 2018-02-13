@@ -50,8 +50,6 @@ class Provision
         $result=true;
         $db=DB::connect();
         $dat = date("y.m.d H:m:s");
-        $c=1;
-        $d=0;
         $sql='INSERT INTO `order`(`datetime`,`user`,`tovname`,`qt`,`unit`,`cost`,`curr`,`term`,`conf`,`note`) VALUES(?,?,?,?,?,?,?,?,?,?);';
         $db->beginTransaction();
         $stmt=$db->prepare($sql);
@@ -59,8 +57,8 @@ class Provision
             if ($value['cost']==''){
                 $value['cost']='0';
             }
-            $stmt->execute(array($dat,$id,$value['tovname'],$value['qt'],$value['unit'],$value['cost'],
-                $value['cur'],$value['term'],'1',$value['note']));
+            $stmt->execute(array($dat,$id,trim($value['tovname']),$value['qt'],$value['unit'],$value['cost'],
+                $value['cur'],$value['term'],'1',trim($value['note'])));
             $s=$stmt->errorInfo();
             if($s[2]!=null){
                 $result=false;
@@ -117,15 +115,15 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
             case 2:
                 $deadline=Provision::deadline($id,$date);
                 $db=DB::connect();
-                $sql='UPDATE `order` SET `conf`=(?),`dateconf`=(?),`deadline`=(?) WHERE `id`=(?);';
+                $sql='UPDATE `order` SET `conf`=(?),`dateconf`=(?),`deadline`=(?),`status`=(?) WHERE `id`=(?);';
                 $stmt=$db->prepare($sql);
-                $stmt->execute([$conf,$date,$deadline,$id]);
+                $stmt->execute([$conf,$date,$deadline,1,$id]);
                 break;
             case 3:
                 $db=DB::connect();
                 $sql='UPDATE `order` SET `conf`=(?),`dateconf`=(?) WHERE `id`=(?);';
                 $stmt=$db->prepare($sql);
-                $stmt->execute([$conf,$date,$id]);
+                $stmt->execute([$conf,$date,1,$id]);
                 break;
         }
         $s=$stmt->errorInfo();
@@ -133,38 +131,41 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 
     static public function createSnabTable()
     {
-        $input='';
+        $result='';
         $db=DB::connect();
         $res=$db->query('SELECT `deadline` FROM `order` WHERE `conf`=2 GROUP BY `deadline` ORDER BY `deadline` ASC;');
         while($res_i=$res->fetch()){
             $dline[]=$res_i['deadline'];
         }
         foreach($dline as $key=>$value){
-            $input.=Provision::createInputLabel($key,$value);
+            $result.='<div class="rowOrder">';
+            $result.=Provision::createInputLabel($value);
+            $result.='<div class="colOrderMain">'.Provision::createTovTable($value,$key).'</div>';
+            $result.='<div class="colOrderDetail" id="tableDetail'.$key.'"></div>';
+            $result.='</div>';
         }
-        $result['input']=$input;
         return $result;
 
     }
 
-    public static function createTovTable($value)
+    public static function createTovTable($value,$key)
     {
-        $i=0;
-        $section='<table class="bordered"><th>Товар</th><th>Кол-во</th>';
+        $result='<table class="bordered"><th>Товар</th><th>Кол-во</th><th>Ед.изм</th><th>Исполнитель</th>';
         $db=DB::connect();
-        $sql='SELECT `tovname`,sum(`qt`) as qt from `order` where `conf`=2 and`deadline`=(?) group by tovname;';
+        $sql='SELECT `order`.`tovname`,sum(`order`.`qt`) as `qt`,`units`.`caption` as `unit` from `order` ';
+        $sql.='inner join `units` on `units`.`id`=`order`.`unit`';
+        $sql.='where `order`.`conf`=2 and `order`.`deadline`=(?) group by `tovname`,`unit`;';
         $stmt=$db->prepare($sql);
         $stmt->execute([$value]);
         $s=$db->errorInfo();
         while($res_i=$stmt->fetch()){
-            $section.='<tr onclick="getTableDetail(\''.$value.'\',\''.$res_i['tovname'].'\')"><td class="tovname">'.$res_i['tovname'].'</td>';
-            $section.='<td class="qt">'.$res_i['qt'].'</td></tr>';
-            $tov[]=$res_i['tovname'];
-            $i++;
-
+            $jq="'$value','$res_i[tovname]',$key";
+            $result.='<tr><td class="tovname hov"  onclick="getTableDetail('.$jq.')">'.$res_i['tovname'].'</td>';
+            $result.='<td class="qt">'.$res_i['qt'].'</td><td class="unit">'.$res_i['unit'].'</td>';
+            $result.='<td class="exec"><select name="dist['.$value.']['.$res_i['tovname'].']"><option value="1">Снабженец</option><option value="2">Нач.снабжения</option></select></td></tr>';
         }
-        $section.='</table>';
-        return $section;
+        $result.='</table>';
+        return $result;
     }
 
     public static function getTableDetail($date,$tov){
@@ -231,20 +232,14 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         return $result;
     }
 
-    private static function createInputLabel($key,$value)
+    private static function createInputLabel($value)
     {
         $day=date('Y-m-d',strtotime('+3 day'));
-        $class='tabs';
+        $class='colOrderDate';
         if ($day>=$value){
-            $class='tabs alert';
+            $class='colOrderDate alert';
         }
-        $ch='';
-        if ($key=='0'){
-            $ch=' checked';
-        }
-        $val="'$value'";
-        $result='<input class="tabs" id="tab'.$key.'" type="radio" name="tabs"'.$ch.' onclick="getTovTable('.$val.')">';
-        $result.='<label class="'.$class.'" for="tab'.$key.'">'.$value.'</label>';
+        $result='<div class="'.$class.'">'.$value.'</div>';
         return $result;
     }
 }

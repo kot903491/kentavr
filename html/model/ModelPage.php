@@ -57,7 +57,7 @@ class ModelPage extends Model
         $this->data['js']['jquery']=JS_DIR.'jquery.js';
         $this->data['js']['script']=JS_DIR.'viewOrder.js';
         try{
-            $data=Provision::createSnabTable();
+            $data['table']=Provision::createSnabTable();
             $loader = new Twig_Loader_Filesystem($this->data['path']);
             $twig=new Twig_Environment($loader);
             $template=$twig->loadTemplate('vieworder.tmpl');

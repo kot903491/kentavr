@@ -238,6 +238,36 @@ button:hover {
 	overflow: hidden;
 }
 
+.rowOrder {
+	width: 100%;
+	overflow: hidden;
+	margin: 10px 0;
+	border-bottom: 1px solid #bcbcbc;
+}
+.colOrderDate {
+	color:black;
+	width: 100%;
+	text-align:center;
+	font-size: 16px;
+	font-weight: 800;
+	margin:10px 2px 0 0;
+	overflow: hidden;
+}
+.colOrderMain {
+	float: left;
+	width: 44%;
+	width: 44%;
+	margin-right: 2px;
+	overflow: hidden;
+}
+.colOrderDetail {
+	float: left;
+	width: 55%;
+	margin-right: 2px;
+	overflow: hidden;
+}
+
+
 table.bordered {
 	margin: 10px 0;
 	padding: 0;
@@ -260,7 +290,7 @@ table.bordered th {
 	color: black;
 }
 
-tr.click {
+td.click {
 	color:black;
 	font-weight: 600;
 	font-size:12px;
@@ -462,7 +492,12 @@ td.dept {
 td.tovname,td.note {
 	width: 25%;
 }
-
+td.exec {
+	width:7%;
+}
+.hov:hover{
+	cursor: pointer;
+}
 /*Табы*/
 
 section.tabs {
@@ -522,13 +557,3 @@ input.tabs:checked + label {
 	background-color: red;
 }
 
-div#orderTable{
-	display: block;
-	width: 35%;
-	float: left;
-}
-div#tableDetail{
-	display: block;
-	width: 62%;
-	float: right;
-}
