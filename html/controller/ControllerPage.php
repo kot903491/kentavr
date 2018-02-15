@@ -14,27 +14,12 @@ class ControllerPage extends Controller
         $page='get'.$this->page;
         if(method_exists($this->model, $page))
         {
-            $data=$this->model->$page();
+            $data=$this->model->$page($this->action);
             $this->view->render($data);
         }
         else{
             // здесь также разумнее было бы кинуть исключение
             Route::ErrorPage404();
-        }
-    }
-
-    public function actionAdd()
-    {
-        if (method_exists($this->model,'add'))
-        {
-            $this->model->add($_POST);
-        }
-    }
-    public function actionConfirm()
-    {
-        if (method_exists($this->model,'confirm'))
-        {
-            $this->model->confirm($_POST);
         }
     }
 }

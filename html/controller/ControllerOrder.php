@@ -2,23 +2,24 @@
 /**
  * Created by PhpStorm.
  * User: timurka
- * Date: 25.01.18
- * Time: 22:57
+ * Date: 14.02.18
+ * Time: 11:40
  */
 
-class ControllerLogin extends Controller
+class ControllerOrder extends Controller
 {
-    function actionFirst()
+    public function actionFirst()
     {
-        // TODO: Implement actionIndex() method.
+        // TODO: Implement actionFirst() method.
         $page='get'.$this->page;
-        if(method_exists($this->model, $page)){
+        if(method_exists($this->model, $page))
+        {
             $data=$this->model->$page($this->action);
             $this->view->render($data);
         }
         else{
             // здесь также разумнее было бы кинуть исключение
-            echo 'не нашел Model->'. $page;
+            Route::ErrorPage404();
         }
     }
 }

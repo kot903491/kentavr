@@ -44,10 +44,21 @@ abstract class Model
             header('Refresh: 0; /');
             exit;
         }
-        if (!User::checkRole()){
+        $s=$this->returnUrl();
+        if (!User::checkRole($this->returnUrl())){
             Route::ErrorPage404();
             exit;
         }
 
+    }
+
+    protected function returnUrl()
+    {
+        $url=explode('/',$_SERVER['REQUEST_URI']);
+        if (isset($url[3])){
+            unset ($url[3]);
+        }
+        $url=implode('/',$url);
+        return $url;
     }
 }

@@ -1,6 +1,6 @@
-function getTableDetail(date,tovname,i) {
+function getTableDetail(date,tovname,un,i) {
     clrdiv();
-    var str="dat="+date+"&tov="+tovname;
+    var str="dat="+date+"&tov="+tovname+"&un="+un;
     var id="#tableDetail"+i;
     $.ajax({
         type: "POST",

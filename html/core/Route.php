@@ -14,7 +14,7 @@ class Route
         // контроллер и действие по умолчанию
         $controller_name = 'Main';
         $page_name = 'First';
-        $action='First';
+        $action='main';
         $routes = explode('/', $_SERVER['REQUEST_URI']);
         // получаем имя контроллера
         if ( !empty($routes[1]) )
@@ -28,20 +28,19 @@ class Route
         }
         // получаем имя экшена
         if(!empty($routes[3])){
-            $action=ucfirst($routes[3]);
+            $action=strtolower($routes[3]);
         }
         // добавляем префиксы
         $model_name ='Model'.$controller_name;
         $controller_name = 'Controller'.$controller_name;
-        $action = 'action'.$action;
 
         // создаем контроллер
-        $controller = new $controller_name($model_name,$page_name);
+        $controller = new $controller_name($model_name,$page_name,$action);
 
-        if(method_exists($controller, $action))
+        if(method_exists($controller,'actionFirst'))
         {
             // вызываем действие контроллера
-            $controller->$action();
+            $controller->actionFirst();
         }
         else
         {

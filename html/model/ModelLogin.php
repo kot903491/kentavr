@@ -28,7 +28,7 @@ class ModelLogin extends Model
         return $this->data;
     }
 
-    public function getLogout()
+    public function getLogout($action)
     {
         User::Logout();
     }

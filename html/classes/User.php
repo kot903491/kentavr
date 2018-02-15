@@ -8,7 +8,7 @@
 
 class User
 {
-    static public function Login($login,$pass)
+    public static function Login($login,$pass)
     {
         $result=false;
         if ($login!='' && $pass!='')
@@ -29,14 +29,14 @@ class User
         }
     }
 
-    static public function Logout()
+    public static function Logout()
     {
         User::unsetSession();
         header('Refresh: 0; /');
         exit;
     }
 
-    static public function regUser($name,$pass,$role,$dept,$fio)
+    public static function regUser($name,$pass,$role,$dept,$fio)
     {
         if (!User::findUser($name))
         {
@@ -44,7 +44,7 @@ class User
         }
     }
 
-    static public function cPass($login,$oldpass,$newpass)
+    public static function cPass($login,$oldpass,$newpass)
     {
         if($oldpass!=$newpass) {
             if (User::findUser($login)) {
@@ -55,7 +55,7 @@ class User
         }
     }
 
-    static public function checkLogin()
+    public static function checkLogin()
     {
         $result=false;
         if (isset($_COOKIE['salt'])&&isset($_SESSION['user']))
@@ -78,21 +78,21 @@ class User
         return $result;
     }
 
-    static public function checkRole()
+    public static function checkRole($url)
     {
         $result=true;
-        if (!User::chRole()){
+        if (!User::chRole($url)){
             $result=false;
         }
         return $result;
     }
 
-    static public function userData($id)
+    public static function userData($id)
     {
         return User::getUserData((int)$id);
     }
 
-    static public function findUser($login)
+    public static function findUser($login)
     {
         $result=false;
         $db=DB::connect();
@@ -107,7 +107,7 @@ class User
         return $result;
     }
 
-    static public function getRole()
+    public static function getRole()
     {
         $result=false;
         $db=DB::connect();
@@ -118,7 +118,7 @@ class User
         return $result;
     }
 
-    static public function getDept()
+    public static function getDept()
     {
         $result=false;
         $db=DB::connect();
@@ -153,11 +153,9 @@ class User
         return $result;
     }
 
-    private static function chRole()
+    private static function chRole($url)
     {
-
         if (isset($_SESSION['role'])){
-            $url=$_SERVER['REQUEST_URI'];
             $db=DB::connect();
             $sql='SELECT access FROM menu_right WHERE url=(?);';
             $stmt=$db->prepare($sql);

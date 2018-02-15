@@ -1,4 +1,7 @@
-<form method="POST">
+{% if msg %}
+<h3>{{ msg|raw }}</h3>
+{% endif %}
+<form method="POST" action="{{ action }}">
 {{ table|raw }}
     <button type="submit">Сохранить</button>
 </form>
