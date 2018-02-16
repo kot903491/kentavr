@@ -1,4 +1,12 @@
 <div class="rightCol">
+    {% if auth %}
+        <div class="block">
+            <h3>{{ user_data.fio }}</h3>
+            <p><b>Подразделение: </b>{{ user_data.dept }}</p>
+            <p><a href="#" class="more">Read more »</a></p>
+        </div>
+    {% endif %}
+
     {% if m_right %}
         <ul class="rightNav">
             {% for menu in m_right %}
@@ -6,11 +14,5 @@
             {% endfor %}
         </ul>
     {% endif %}
-    {% if auth %}
-    <div class="block">
-        <h3>{{ user_data.fio }}</h3>
-        <p><b>Подразделение: </b>{{ user_data.dept }}</p>
-        <p><a href="#" class="more">Read more »</a></p>
-    </div>
-    {% endif %}
+
 </div>

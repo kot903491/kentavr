@@ -81,7 +81,7 @@ class ModelOrder extends Model
                     $data['msg']=$this->data['msg'];
                     $loader = new Twig_Loader_Filesystem($this->data['path']);
                     $twig = new Twig_Environment($loader);
-                    $template = $twig->loadTemplate('vieworder.tmpl');
+                    $template = $twig->loadTemplate('ordernot.tmpl');
                     $this->data['content'] = $template->render($data);
                 } catch (Exception $e) {
                     die('ERROR: ' . $e->getMessage());
@@ -100,8 +100,19 @@ class ModelOrder extends Model
         }
     }
 
-    public function getMyprov(){
-
+    public function getMyprov()
+    {
+        try {
+            $data['content'] = Provision::createMyProv();
+            $data['msg']=$this->data['msg'];
+            $loader = new Twig_Loader_Filesystem($this->data['path']);
+            $twig = new Twig_Environment($loader);
+            $template = $twig->loadTemplate('myprov.tmpl');
+            $this->data['content'] = $template->render($data);
+        } catch (Exception $e) {
+            die('ERROR: ' . $e->getMessage());
+        }
+        return $this->data;
     }
 
     private function add($data)

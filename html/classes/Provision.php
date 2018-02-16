@@ -159,6 +159,32 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         return Provision::setExecAv($deadline,$tovname,$exec,$un);
     }
 
+    public static function createMyProv()
+    {
+        $result='<input id="tab2" class="tabs" type="radio" name="tabs" checked><label class="tabs"  for="tab2">В работе</label>';
+        $result.='<input id="tab1" class="tabs"  type="radio" name="tabs"><label class="tabs"  for="tab1">На утверждении</label>';
+        $result.='<input id="tab3" class="tabs"  type="radio" name="tabs"><label class="tabs"  for="tab3">Отказано</label>';
+        $user=(int)$_SESSION['id'];
+        $db = DB::connect();
+        for ($conf=1;$conf<=3;$conf++){
+            $result.='<section id="content'.$conf.'" class="tabs">';
+            $sql = 'SELECT `deadline` FROM `order` WHERE `user`=(?) and `conf`=(?) GROUP BY `deadline` ORDER BY `deadline` ASC;';
+            $stmt = $db->prepare($sql);
+            $stmt->execute([$user, $conf]);
+            $s = $stmt->errorInfo();
+            while ($res_i = $stmt->fetch()) {
+                $result .= '<div class="rowOrder">';
+                if ($res_i['deadline']!=null) {
+                    $result .= Provision::createInputLabel($res_i['deadline']);
+                }
+                $result .= '<div class="colOrderAll">' . self::createMyTable($user, $res_i['deadline'], $conf) . '</div>';
+                $result .= '</div>';
+            }
+            $result .= '</section>';
+        }
+        return $result;
+    }
+
     private static function createTovTable($value,$key)
     {
         $result='<table class="bordered"><th>Товар</th><th>Кол-во</th><th>Ед.изм</th><th>Исполнитель</th>';
@@ -276,7 +302,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         $res=$stmt->fetch();
         if ($res){
             $id=$res['id'];
-            $sql='UPDATE `order` SET `id_sup`=(?) WHERE `deadline`=(?) and `tovname`=(?) and `unit`=(?) and `flag`=1 and `id_sup`=0;';
+            $sql='UPDATE `order` SET `id_sup`=(?),`status`=2 WHERE `deadline`=(?) and `tovname`=(?) and `unit`=(?) and `flag`=1 and `id_sup`=0;';
             $stmt=$db->prepare($sql);
             $stmt->execute([$id,$deadline,$tovname,$un]);
             $s=$stmt->errorInfo();
@@ -294,7 +320,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
                 $result=false;
             }
             $id=$db->lastInsertId();
-            $sql='UPDATE `order` SET `id_sup`=(?) WHERE `deadline`=(?) and `tovname`=(?) and `unit`=(?) and `flag`=1 and `id_sup`=0;';
+            $sql='UPDATE `order` SET `id_sup`=(?),`status`=2 WHERE `deadline`=(?) and `tovname`=(?) and `unit`=(?) and `flag`=1 and `id_sup`=0;';
             $stmt=$db->prepare($sql);
             $stmt->execute([$id,$deadline,$tovname,$un]);
             $s=$stmt->errorInfo();
@@ -308,6 +334,68 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
                 $db->rollBack();
             }
         }
+        return $result;
+    }
+
+    private static function createMyTable($user,$dline,$conf)
+    {
+        $db=DB::connect();
+        $result='<table class="bordered">';
+        switch ($conf){
+            case 1:
+                $result.='<th>Дата заявки</th><th>Наименование</th><th>Кол-во</th><th>Ед.изм</th><th>Цена</th><th>Валюта</th>';
+                $sql='SELECT `order`.`datetime`,`order`.`tovname`,`order`.`qt`,';
+                $sql.='`units`.`caption` as `unit`,`order`.`cost`,`currency`.`caption` as `curr` FROM `order`';
+                $sql.='INNER JOIN `units` on `units`.`id`=`order`.`unit`';
+                $sql.='INNER JOIN `currency` on `currency`.`id`=`order`.`curr`';
+                $sql.='WHERE `order`.`user`=(?) and `order`.`conf`=(?)';
+                $stmt=$db->prepare($sql);
+                $stmt->execute([$user,$conf]);
+                $s=$stmt->errorInfo();
+                while ($res_i=$stmt->fetch()){
+                    $result.='<tr><td class="date">'.date('d.m.Y',strtotime($res_i['datetime'])).'</td>';
+                    $result.='<td class="tovname">'.$res_i['tovname'].'</td><td class="qt">'.$res_i['qt'].'</td>';
+                    $result.='<td class="unit">'.$res_i['unit'].'</td><td class="cost">'.$res_i['cost'].'</td>';
+                    $result.='<td class="curr">'.$res_i['curr'].'</td></tr>';
+                }
+                break;
+            case 2:
+                $result.='<th>Наименование</th><th>Кол-во</th><th>Ед.изм</th><th>Статус</th>';
+                $sql='SELECT `order`.`tovname`,sum(`order`.`qt`) as `qt`,';
+                $sql.='`units`.`caption` as `unit`,';
+                $sql.='`status`.`caption` as `status` FROM `order`';
+                $sql.='INNER JOIN `units` on `units`.`id`=`order`.`unit`';
+                $sql.='INNER JOIN `status` on `status`.`id`=`order`.`status`';
+                $sql.='WHERE `order`.`user`=(?) and `order`.`deadline`=(?) and `order`.`conf`=(?)';
+                $sql.='group by `deadline`,`tovname`,`unit`,`status`;';
+                $stmt=$db->prepare($sql);
+                $stmt->execute([$user,$dline,$conf]);
+                $s=$stmt->errorInfo();
+                while ($res_i=$stmt->fetch()){
+                    $result.='<tr><td class="tovname">'.$res_i['tovname'].'</td><td class="qt">'.$res_i['qt'].'</td>';
+                    $result.='<td class="unit">'.$res_i['unit'].'</td><td>'.$res_i['status'].'</td></tr>';
+                }
+                break;
+            case 3:
+                $result.='<th>Дата заявки</th><th>Наименование</th><th>Кол-во</th><th>Ед.изм</th><th>Цена</th><th>Валюта</th>';
+                $sql='SELECT `order`.`datetime`,`order`.`tovname`,`order`.`qt`,';
+                $sql.='`units`.`caption` as `unit`,`order`.`cost`,`currency`.`caption` as `curr` FROM `order`';
+                $sql.='INNER JOIN `units` on `units`.`id`=`order`.`unit`';
+                $sql.='INNER JOIN `currency` on `currency`.`id`=`order`.`curr`';
+                $sql.='WHERE `order`.`user`=(?) and `order`.`conf`=(?)';
+                $stmt=$db->prepare($sql);
+                $stmt->execute([$user,$conf]);
+                $s=$stmt->errorInfo();
+                while ($res_i=$stmt->fetch()){
+                    $result.='<tr><td class="date">'.date('d.m.Y',strtotime($res_i['datetime'])).'</td>';
+                    $result.='<td class="tovname">'.$res_i['tovname'].'</td><td class="qt">'.$res_i['qt'].'</td>';
+                    $result.='<td class="unit">'.$res_i['unit'].'</td><td class="cost">'.$res_i['cost'].'</td>';
+                    $result.='<td class="curr">'.$res_i['curr'].'</td></tr>';
+                }
+                break;
+
+        }
+        $result.='</table>';
         return $result;
     }
 }

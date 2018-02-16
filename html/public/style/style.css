@@ -256,7 +256,11 @@ button:hover {
 .colOrderMain {
 	float: left;
 	width: 44%;
-	width: 44%;
+	margin-right: 2px;
+	overflow: hidden;
+}
+.colOrderAll {
+	width: 95%;
 	margin-right: 2px;
 	overflow: hidden;
 }
@@ -501,8 +505,8 @@ td.exec {
 /*Табы*/
 
 section.tabs {
-	display: block;
-	padding: 20px 0 0;
+	display: none;
+	padding: 5px 0 0;
 	border-top: 1px solid #ddd;
 }
 
@@ -514,9 +518,10 @@ label.tabs {
 	display: inline-block;
 	margin: 0 0 -1px;
 	padding: 15px 25px;
-	font-weight: 600;
+	font-weight: 800;
+	font-size: 14px;
 	text-align: center;
-	color: #4b4b4b;
+	color: #555;
 	border: 1px solid transparent;
 }
 
@@ -526,16 +531,28 @@ label.tabs:before {
 	margin-right: 10px;
 }
 
+label.tabs[for*='1']:before { content: ''; }
+label.tabs[for*='2']:before { content: ''; }
+label.tabs[for*='3']:before { content: ''; }
+label.tabs[for*='4']:before { content: ''; }
+
 label.tabs:hover {
 	color: #888;
 	cursor: pointer;
 }
 
 input.tabs:checked + label {
-	color: #000;
+	color: #000000;
 	border: 1px solid #ddd;
 	border-top: 2px solid orange;
-	border-bottom: 4px solid #fff;
+	border-bottom: 1px solid #fff;
+}
+
+#tab1:checked ~ #content1,
+#tab2:checked ~ #content2,
+#tab3:checked ~ #content3,
+#tab4:checked ~ #content4 {
+	display: block;
 }
 
 @media screen and (max-width: 650px) {
@@ -553,7 +570,3 @@ input.tabs:checked + label {
 		padding: 15px;
 	}
 }
-.alert{
-	background-color: red;
-}
-
