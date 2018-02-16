@@ -113,7 +113,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
     {
         switch($conf){
             case 2:
-                $deadline=Provision::deadline($id,$date);
+                $deadline=self::deadline($id,$date);
                 $db=DB::connect();
                 $sql='UPDATE `order` SET `conf`=(?),`dateconf`=(?),`deadline`=(?),`status`=(?),`flag`=0 WHERE `id`=(?);';
                 $stmt=$db->prepare($sql);
@@ -131,7 +131,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 
     public static function createSnabTable()
     {
-        Provision::orderFrost();
+        self::orderFrost();
         $result='';
         $db=DB::connect();
         $res=$db->query('SELECT `deadline` FROM `order` WHERE `conf`=2 and`flag`=1 and `id_sup`=0 GROUP BY `deadline` ORDER BY `deadline` ASC;');
@@ -144,8 +144,8 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
             }
             foreach ($dline as $key => $value) {
                 $result .= '<div class="rowOrder">';
-                $result .= Provision::createInputLabel($value);
-                $result .= '<div class="colOrderMain">' . Provision::createTovTable($value, $key) . '</div>';
+                $result .= self::createInputLabel($value);
+                $result .= '<div class="colOrderMain">' . self::createTovTable($value, $key) . '</div>';
                 $result .= '<div class="colOrderDetail" id="tableDetail' . $key . '"></div>';
                 $result .= '</div>';
             }
@@ -156,7 +156,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 
     public static function setExec($deadline,$tovname,$un,$exec)
     {
-        return Provision::setExecAv($deadline,$tovname,$exec,$un);
+        return self::setExecAv($deadline,$tovname,$exec,$un);
     }
 
     public static function createMyProv()
@@ -175,13 +175,70 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
             while ($res_i = $stmt->fetch()) {
                 $result .= '<div class="rowOrder">';
                 if ($res_i['deadline']!=null) {
-                    $result .= Provision::createInputLabel($res_i['deadline']);
+                    $result .= self::createInputLabel($res_i['deadline']);
                 }
                 $result .= '<div class="colOrderAll">' . self::createMyTable($user, $res_i['deadline'], $conf) . '</div>';
                 $result .= '</div>';
             }
             $result .= '</section>';
         }
+        return $result;
+    }
+
+    public static function createExecTable()
+    {
+        $result='';
+        $exec=self::getExecId();
+        $dline=self::getExecDeadline($exec);
+        if ($dline!=null) {
+            foreach ($dline as $key => $value) {
+                $result .= '<div class="rowOrder">';
+                $result .= self::createInputLabel($value);
+                $result .= '<div class="colOrderAll">' . self::getExecTable($exec, $value) . '</div>';
+                $result .= '</div>';
+            }
+        }
+        return $result;
+    }
+
+    private static function getExecId()
+    {
+        if (isset($_SESSION['id'])){
+            $db=DB::connect();
+            $sql='SELECT `id` FROM `executor` WHERE `id_user`=(?);';
+            $stmt=$db->prepare($sql);
+            $stmt->execute([$_SESSION['id']]);
+            $res=$stmt->fetch();
+            return $res['id'];
+        }
+        else{
+            Route::ErrorPage404();
+        }
+    }
+
+    private static function getExecTable($exec,$deadline)
+    {
+        $result='<table class="bordered"><tr><th colspan="5">Заказ</th><th colspan="4">Исполнение</th></tr>';
+        $result.='<tr><th>Наименование</th><th>Кол-во</th><th>Ед.изм</th><th>Цена max</th><th>Валюта</th>';
+        $result.='<th>Цена</th><th>Валюта</th><th>Кол-во</th><th>Ед.изм</th></tr>';
+        $db=DB::connect();
+        $sql='select `order_supply`.`id`, `order`.`tovname`,';
+        $sql.='sum(`order`.`qt`) as `qt`,`units`.`caption` as `unit`,max(`order`.`cost`) as `cost`,';
+        $sql.='`currency`.`caption` as `curr` from `order_supply`';
+        $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
+        $sql.='inner join `units` on `units`.`id`=`order`.`unit`';
+        $sql.='inner join `currency` on `currency`.`id`=`order`.`curr`';
+        $sql.='where `order_supply`.`exec` = (?) and `order`.`deadline`=(?)';
+        $sql.='group by tovname,deadline,curr,unit,id;';
+        $stmt=$db->prepare($sql);
+        $stmt->execute([$exec,$deadline]);
+        while($res_i=$stmt->fetch()){
+            $result.='<tr><td class="tovname">'.$res_i['tovname'].'</td><td  class="qt">'.$res_i['qt'].'</td>';
+            $result.='<td class="unit">'.$res_i['unit'].'</td><td class="cost">'.$res_i['cost'].'</td>';
+            $result.='<td class="curr">'.$res_i['curr'].'</td>';
+            $result.='<td class="cost"></td><td class="curr"></td><td class="qt"></td><td class="unit"></td></tr>';
+        }
+        $result.='</table>';
         return $result;
     }
 
@@ -246,6 +303,22 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 
     }
 
+    private static function getExecDeadline($exec)
+    {
+        $dline=null;
+        $sql='select `order`.`deadline` from `order_supply`';
+        $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
+        $sql.='where `order_supply`.`exec`=(?)';
+        $sql.='group by `deadline`;';
+        $db=DB::connect();
+        $stmt=$db->prepare($sql);
+        $stmt->execute([$exec]);
+        while($res_i=$stmt->fetch()){
+            $dline[]=$res_i['deadline'];
+        }
+        return $dline;
+    }
+
     private static function deadline($id,$date)
     {
         $db=DB::connect();
@@ -296,9 +369,13 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
     {
         $result=true;
         $db=DB::connect();
-        $sql='SELECT `id` FROM `order_supply` WHERE `deadline`=(?) and `tovname`=(?) and `unit`=(?) and `exec`=(?);';
+        $sql='select `order_supply`.`id` from `order_supply`';
+        $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
+        $sql.='where `order`.`deadline`=(?) and `order`.`tovname`=(?)';
+        $sql.='and `order`.`unit`=(?) and `order_supply`.`exec`=(?) group by `id`;';
         $stmt=$db->prepare($sql);
         $stmt->execute([$deadline,$tovname,$un,$exec]);
+        $s=$stmt->errorInfo();
         $res=$stmt->fetch();
         if ($res){
             $id=$res['id'];
@@ -311,10 +388,10 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
             }
         }
         else{
-            $sql='INSERT INTO `order_supply` (`deadline`,`tovname`,`unit`,`exec`) VALUES(?,?,?,?)';
+            $sql='INSERT INTO `order_supply` (`exec`) VALUES(?)';
             $db->beginTransaction();
             $stmt=$db->prepare($sql);
-            $stmt->execute([$deadline,$tovname,$un,$exec]);
+            $stmt->execute([$exec]);
             $s=$stmt->errorInfo();
             if($s[2]!=null){
                 $result=false;

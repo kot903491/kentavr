@@ -18,19 +18,15 @@ class ModelAdmin extends Model
                         if (!User::findUser($_POST['uname'])) {
                             User::regUser($_POST['uname'], $_POST['pass1'], $_POST['role'], $_POST['dept'], $_POST['fio']);
                             $_SESSION['msg'] = 'Пользователь создан';
-                            header('Refresh: 0; ' . $_SERVER['REQUEST_URI']);
-                            exit;
                         } else {
                             $_SESSION['msg'] = 'Такой юзер уже зарегистрирован';
-                            header('Refresh: 0; ' . $_SERVER['REQUEST_URI']);
-                            exit;
                         }
                     } else {
                         $_SESSION['msg'] = 'Пароли не совпадают';
-                        header('Refresh: 0; ' . $_SERVER['REQUEST_URI']);
-                        exit;
                     }
                 }
+                header('Refresh: 0; ' . $this->returnUrl());
+                exit;
                 break;
             case 'main':
                 try {
@@ -48,7 +44,6 @@ class ModelAdmin extends Model
                 }
                 return $this->data;
                 break;
-
         }
     }
 }

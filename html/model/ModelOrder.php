@@ -107,12 +107,30 @@ class ModelOrder extends Model
             $data['msg']=$this->data['msg'];
             $loader = new Twig_Loader_Filesystem($this->data['path']);
             $twig = new Twig_Environment($loader);
-            $template = $twig->loadTemplate('myprov.tmpl');
+            $template = $twig->loadTemplate('prov.tmpl');
             $this->data['content'] = $template->render($data);
         } catch (Exception $e) {
             die('ERROR: ' . $e->getMessage());
         }
         return $this->data;
+    }
+
+    public function getOrderexec($action)
+    {
+        switch ($action){
+            case 'main':
+                try{
+                    $data['content']=Provision::createExecTable();
+                    $loader= new Twig_Loader_Filesystem($this->data['path']);
+                    $twig=new Twig_Environment($loader);
+                    $template=$twig->loadTemplate('prov.tmpl');
+                    $this->data['content']=$template->render($data);
+                }catch (Exception $e){
+                    die('ERROR: '.$e->getMessage());
+                }
+                return $this->data;
+        }
+
     }
 
     private function add($data)

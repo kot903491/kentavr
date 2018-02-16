@@ -162,10 +162,10 @@ class User
             $stmt->execute([$url]);
             $res=$stmt->fetch();
             $res=explode(',',$res['access']);
+            $result=false;
             foreach($res as $value){
-                $result=true;
-                if ($value!='0' && $value!='99' && $value!=$_SESSION['role']){
-                    $result=false;
+                if ($value=='0' || $value=='99' || $value==$_SESSION['role']){
+                    $result=true;
                 }
 
             }

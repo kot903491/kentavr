@@ -44,7 +44,6 @@ abstract class Model
             header('Refresh: 0; /');
             exit;
         }
-        $s=$this->returnUrl();
         if (!User::checkRole($this->returnUrl())){
             Route::ErrorPage404();
             exit;
