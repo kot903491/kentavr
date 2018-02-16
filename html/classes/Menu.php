@@ -30,7 +30,7 @@ class Menu
     static public function getRight($i=0)
     {
         $db=DB::connect();
-        $sql='SELECT caption,url,access FROM menu_right ORDER BY id ASC';
+        $sql='SELECT `caption`,`url`,`access` FROM `menu_right` ORDER BY `access` ASC';
         $res = $db->prepare($sql);
         $res->execute();
         while ($res_i=$res->fetch()){

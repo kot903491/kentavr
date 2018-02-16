@@ -14,7 +14,7 @@ class ControllerAdmin extends Controller
         $page='get'.$this->page;
         if(method_exists($this->model, $page))
         {
-            $data=$this->model->$page();
+            $data=$this->model->$page($this->action);
             $this->view->render($data);
         }
         else{
