@@ -88,6 +88,31 @@ INSERT INTO `dept` VALUES (1,'ВЦ'),(2,'Гараж'),(3,'РМЦ'),(4,'ПВТС�
 UNLOCK TABLES;
 
 --
+-- Table structure for table `executor`
+--
+
+DROP TABLE IF EXISTS `executor`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `executor` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `exec` varchar(45) NOT NULL,
+  `id_user` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `executor`
+--
+
+LOCK TABLES `executor` WRITE;
+/*!40000 ALTER TABLE `executor` DISABLE KEYS */;
+INSERT INTO `executor` VALUES (1,'Нач.снабжения',3),(2,'Снабженец',5);
+/*!40000 ALTER TABLE `executor` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `menu_main`
 --
 
@@ -129,7 +154,7 @@ CREATE TABLE `menu_right` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `caption_UNIQUE` (`caption`),
   UNIQUE KEY `url_UNIQUE` (`url`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -138,7 +163,7 @@ CREATE TABLE `menu_right` (
 
 LOCK TABLES `menu_right` WRITE;
 /*!40000 ALTER TABLE `menu_right` DISABLE KEYS */;
-INSERT INTO `menu_right` VALUES (1,'Menu 1','#','0'),(2,'Menu 2','##','0'),(3,'Menu 3','###','0'),(7,'Оформить заявку на ТМЦ','/page/addprovision','99'),(8,'Создать пользователя','/admin/users/new','1'),(9,'Утверждение заявок','/page/appprovision','6'),(10,'Снабжение - заявки','/page/vieworder','2');
+INSERT INTO `menu_right` VALUES (1,'Menu 1','#','0'),(2,'Menu 2','##','0'),(3,'Menu 3','###','0'),(7,'Оформить заявку на ТМЦ','/order/addprovision','99'),(8,'Создать пользователя','/admin/addusers','1'),(9,'Утверждение заявок','/order/appprovision','6'),(10,'Снабжение - не назначенное','/order/ordernot','2'),(11,'Мои заявки на ТМЦ','/order/myprov','99'),(12,'Снабжение - к исполнению','/order/orderexec','2,3');
 /*!40000 ALTER TABLE `menu_right` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -163,22 +188,23 @@ CREATE TABLE `order` (
   `note` varchar(100) DEFAULT NULL,
   `dateconf` date DEFAULT NULL,
   `deadline` date DEFAULT NULL,
-  `qt_prov` decimal(10,2) DEFAULT NULL,
-  `cost_prov` decimal(10,2) DEFAULT NULL,
-  `curr_prov` int(11) DEFAULT NULL,
-  `note_prov` varchar(250) DEFAULT NULL,
+  `status` int(11) DEFAULT NULL,
+  `flag` tinyint(4) DEFAULT NULL,
+  `id_sup` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_provision_unit_idx` (`unit`),
   KEY `fk_provision_curr_idx` (`curr`),
   KEY `fk_provision_term_idx` (`term`),
   KEY `fk_provision_conf_idx` (`conf`),
-  KEY `fk_provision_id` (`user`),
-  CONSTRAINT `fk_provision_conf` FOREIGN KEY (`conf`) REFERENCES `confirm` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_curr` FOREIGN KEY (`curr`) REFERENCES `currency` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_id` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_term` FOREIGN KEY (`term`) REFERENCES `term` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
-  CONSTRAINT `fk_provision_unit` FOREIGN KEY (`unit`) REFERENCES `units` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+  KEY `fk_order_id` (`user`),
+  KEY `fk_order_status_idx` (`status`),
+  CONSTRAINT `fk_order_conf` FOREIGN KEY (`conf`) REFERENCES `confirm` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_order_curr` FOREIGN KEY (`curr`) REFERENCES `currency` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_order_id` FOREIGN KEY (`user`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_order_status` FOREIGN KEY (`status`) REFERENCES `status` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_order_term` FOREIGN KEY (`term`) REFERENCES `term` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
+  CONSTRAINT `fk_order_unit` FOREIGN KEY (`unit`) REFERENCES `units` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -187,8 +213,37 @@ CREATE TABLE `order` (
 
 LOCK TABLES `order` WRITE;
 /*!40000 ALTER TABLE `order` DISABLE KEYS */;
-INSERT INTO `order` VALUES (1,'2018-02-09 16:02:06',2,'Ремкомплект поршневой группы',2.00,4,1000.00,1,2,2,'','2018-02-09','2018-02-23',NULL,NULL,NULL,NULL),(2,'2018-02-09 16:02:06',2,'Прокладка тормозной системы',5.00,4,2000.00,3,3,2,'','2018-02-09','2018-03-02',NULL,NULL,NULL,NULL),(3,'2018-02-09 23:02:13',2,'товар 1',1.00,1,1.00,1,1,2,'','2018-02-09','2018-02-14',NULL,NULL,NULL,NULL),(4,'2018-02-09 23:02:13',2,'товар 2',1.00,1,1.00,1,2,2,'','2018-02-09','2018-02-23',NULL,NULL,NULL,NULL),(5,'2018-02-09 23:02:13',2,'товар 3',1.00,1,1.00,1,3,2,'','2018-02-09','2018-03-02',NULL,NULL,NULL,NULL),(6,'2018-02-09 23:02:13',2,'товар 4',1.00,1,1.00,1,4,2,'','2018-02-09','2018-03-16',NULL,NULL,NULL,NULL),(7,'2018-02-09 23:02:43',4,'товар 2',1.00,1,1.00,1,2,2,'','2018-02-09','2018-02-23',NULL,NULL,NULL,NULL),(8,'2018-02-09 23:02:43',4,'товар 5',2555.00,1,5.00,1,1,3,'','2018-02-09',NULL,NULL,NULL,NULL,NULL),(9,'2018-02-11 21:02:55',4,'товар8',1.00,1,500.00,1,1,2,'','2018-02-12','2018-02-16',NULL,NULL,NULL,NULL),(10,'2018-02-12 16:02:23',5,'товар 2',5.00,1,0.00,1,2,2,'','2018-02-12','2018-02-23',NULL,NULL,NULL,NULL),(11,'2018-02-12 16:02:50',5,'товар 2',5.00,1,0.00,1,3,2,'','2018-02-12','2018-03-02',NULL,NULL,NULL,NULL),(12,'2018-02-13 00:02:35',6,'товар 3',50.00,2,20.00,1,3,2,'примечание','2018-02-13','2018-03-02',NULL,NULL,NULL,NULL),(13,'2018-02-13 00:02:35',6,'товар 3',50.00,1,80.00,1,3,2,'примечание 2','2018-02-13','2018-03-02',NULL,NULL,NULL,NULL);
+INSERT INTO `order` VALUES (1,'2018-02-14 00:02:43',2,'Товар 1',1.00,1,1.00,1,2,2,'прим','2018-02-14','2018-02-23',2,1,2),(2,'2018-02-14 00:02:43',2,'товар 2',5.00,1,5.00,1,2,2,'прим','2018-02-14','2018-02-23',2,1,3),(3,'2018-02-14 00:02:43',2,'товар 2',20.00,1,5.00,1,4,2,'прим','2018-02-14','2018-03-16',2,1,5),(4,'2018-02-14 11:02:21',2,'товар тест',5.00,1,5.00,1,1,2,'','2018-02-14','2018-02-21',2,1,1),(5,'2018-02-14 11:02:13',2,'товар тест',5.00,1,0.00,1,1,2,'','2018-02-14','2018-02-21',2,1,1),(6,'2018-02-14 11:02:56',2,'товар тест',15.00,1,0.00,1,1,2,'','2018-02-14','2018-02-21',2,1,1),(7,'2018-02-14 11:02:05',2,'товар тест',5.00,1,0.00,1,1,2,'','2018-02-14','2018-02-21',2,1,1),(8,'2018-02-14 12:02:04',3,'12345',1.00,1,0.00,1,1,3,'','2018-02-14',NULL,NULL,NULL,NULL),(9,'2018-02-15 11:02:59',2,'товар 2',10.00,2,0.00,1,2,2,'','2018-02-15','2018-02-23',2,1,NULL),(10,'2018-02-15 14:02:56',2,'товар 2',50.00,1,0.00,1,2,2,'','2018-02-15','2018-02-23',2,1,3),(11,'2018-02-15 15:02:26',2,'товар новый',10.00,3,10.00,2,3,2,'','2018-02-15','2018-03-02',2,1,7),(12,'2018-02-15 15:02:56',2,'товар новый',2.00,1,2.00,1,1,2,'','2018-02-15','2018-02-21',2,1,6),(13,'2018-02-15 15:02:51',3,'товар супер новый',1.00,1,0.00,1,1,2,'','2018-02-15','2018-02-21',2,1,8),(14,'2018-02-15 16:02:39',2,'товар тест',1.00,1,0.00,1,1,2,'','2018-02-15','2018-02-21',2,1,1),(15,'2018-02-16 11:02:19',2,'dsfdfgdfhdhgfghfg',5.00,1,0.00,1,1,2,'','2018-02-16','2018-02-21',2,1,9),(16,'2018-02-16 16:02:53',3,'vcngvgjgjvhjh',5.00,1,500.00,1,4,2,'','2018-02-17','2018-03-23',2,1,10);
 /*!40000 ALTER TABLE `order` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `order_supply`
+--
+
+DROP TABLE IF EXISTS `order_supply`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `order_supply` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `qt` decimal(10,2) DEFAULT NULL,
+  `cost` decimal(10,2) DEFAULT NULL,
+  `curr` int(11) DEFAULT NULL,
+  `exec` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_order_supply_exec_idx` (`exec`),
+  CONSTRAINT `fk_order_supply_exec` FOREIGN KEY (`exec`) REFERENCES `executor` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `order_supply`
+--
+
+LOCK TABLES `order_supply` WRITE;
+/*!40000 ALTER TABLE `order_supply` DISABLE KEYS */;
+INSERT INTO `order_supply` VALUES (1,NULL,NULL,NULL,2),(2,NULL,NULL,NULL,2),(3,NULL,NULL,NULL,2),(4,NULL,NULL,NULL,2),(5,NULL,NULL,NULL,2),(6,NULL,NULL,NULL,2),(7,NULL,NULL,NULL,2),(8,NULL,NULL,NULL,2),(9,NULL,NULL,NULL,2),(10,NULL,NULL,NULL,2);
+/*!40000 ALTER TABLE `order_supply` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -362,7 +417,7 @@ CREATE TABLE `users` (
   KEY `fk_users_role_idx` (`role`),
   CONSTRAINT `fk_users_dept` FOREIGN KEY (`dept`) REFERENCES `dept` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `fk_users_role` FOREIGN KEY (`role`) REFERENCES `role` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -371,7 +426,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin','$2y$10$NG1F7L1WzJWgdJvRelJmh.VNpzgCQEfFTdV2MDTrvt0oiETAOdcTW','S<-/PL[Y)C{b)^b!i>S*not9)OCkX7','',1,1,'Тимур'),(2,'test','$2y$10$Lj6q.nthSj1s7XfdSoI1z.G5PU3Z3IdaFkUw9x3gIWcNUPcyhhBfK','f$J.H1C|r6fac)~r&s+FX[tp%8?|m0',NULL,4,2,'тест'),(3,'test2','$2y$10$Gy24JvLfnMkAfQ86PXreC.PKouIdbrdENKmt1VLwVzoyTpkkWhbUS','Gok~k?p~K(GGS8hchZ)nIZNS(t9HED',NULL,4,3,'test2'),(4,'test3','$2y$10$r9wGyItpEPZszFLKPp3t7.zpYSv5KRskujKtg45bwQ79Q4f2mOTqq','!,S/.50/4k5aSm81p]o-+YTIgx4[5`',NULL,6,1,'Инженер'),(5,'snab','$2y$10$9DbjMGToUp1ygR6pyBEB6uQOLiAQ59Eo4oOAQ8yZ6tIKDreonTPKy','y4rU[)*bD,$49$7R7@L+,9lSYd9~A/',NULL,2,1,'Захарова Наталья'),(6,'engeneer','$2y$10$Q0lId7NElxVlgKqq.PTL2uFRA2Yp/pOn9aySrP2XApwuDYolOAHRG','[!PYgO0e<.n1%<8C+{>G@^czyMaBZu',NULL,6,6,'Тест 1'),(7,'carpark','$2y$10$vFLczkgbAxrJDwzaOcy.dOE.PF6ybh/7QzpZgBTyCmfqBgYJq.Ocy','jt+2p%/t3FReNh2)k8GpgNNMba!k|{',NULL,4,2,'Тест 2'),(8,'rmc','$2y$10$79/LgUC8gVJp4j8mC5o3COJC9Y2ZYet.6ww2pkORezz43aY04yddi','v3cGZ@b4+BbjV|aNh7d-PUDXyHs8y[',NULL,4,3,'Тест 3');
+INSERT INTO `users` VALUES (1,'admin','$2y$10$NG1F7L1WzJWgdJvRelJmh.VNpzgCQEfFTdV2MDTrvt0oiETAOdcTW','S<-/PL[Y)C{b)^b!i>S*not9)OCkX7','',1,1,'Тимур'),(2,'ingener','$2y$10$C2XPfom6CYLHYFhosd6pTOG0NzpmTkTSYcdVP6Npze/1uzhwinFR.','UcpO5HBV2|/h`Gp1jCxRTE-}!}`Yh>',NULL,6,6,'Инженер'),(3,'snab','$2y$10$AnuCWv1OCHtVfEEnlIios.lk5CYwI2p6l4UfooFSyKgoNodyaOHMG','iTGk>{}/Z/s1b[Sbs29xXn?<.gx+)U',NULL,2,6,'Снабжение'),(4,'test','$2y$10$GFqzBJGO8e3cxULCBOkEvOxuWIW2AhR/oORERLL89PlF/5c97r8Qq','GEb@/hC3msCB?npORkKHRxrUXP}Y!V',NULL,4,1,'Заказчик'),(5,'igor','$2y$10$4rTPU6FS66GIXW.TdHq3i.NplRwWyFkl1.JEvQYXVzqzQB3ZYv/su','%>dIM?/F.V)(8VPmyRiAn)IY^Mu9iX',NULL,3,6,'Игорь');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -384,4 +439,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-02-13 12:58:18
+-- Dump completed on 2018-02-17  8:48:43
