@@ -10,34 +10,21 @@ class Provision
 {
     public static function addTR($i = 0)
     {
-        $db = DB::connect();
-        $res = $db->query('SELECT * FROM units;');
-        while ($res_i = $res->fetch()) {
-            $unit[] = $res_i;
-        }
-        $res = $db->query('SELECT * FROM currency;');
-        while ($res_i = $res->fetch()) {
-            $cur[] = $res_i;
-        }
-        $res = $db->query('SELECT * FROM term;');
-        while ($res_i = $res->fetch()) {
-            $term[] = $res_i;
-        }
         $result = '<div><input type="text" name="data[' . $i . '][tovname]" required></div>
             <div class="num"><input type="number" name="data[' . $i . '][qt]" required></div>
             <div class="unit"><select name="data[' . $i . '][unit]">';
-        foreach ($unit as $value) {
+        foreach (self::getUnits() as $value) {
             $result .= '<option value="' . $value['id'] . '">' . $value['caption'] . '</option>';
         }
         $result .= '</select></div>
             <div class="cost"><input type="number" name="data[' . $i . '][cost]" step="any"></div>
             <div class="cur"><select name="data[' . $i . '][cur]">';
-        foreach ($cur as $value) {
+        foreach (self::getCurrency() as $value) {
             $result .= '<option value="' . $value['id'] . '">' . $value['caption'] . '</option>';
         }
         $result .= '</select></div>
             <div class="term"><select name="data[' . $i . '][term]">';
-        foreach ($term as $value) {
+        foreach (self::getTerm() as $value) {
             $result .= '<option value="' . $value['id'] . '">' . $value['caption'] . '</option>';
         }
         $result .= '</select></div>
@@ -185,6 +172,10 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         return $result;
     }
 
+    /* создает таблицу снабженца
+     *
+     * @return string
+     * */
     public static function createExecTable()
     {
         $result='';
@@ -218,9 +209,9 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 
     private static function getExecTable($exec,$deadline)
     {
-        $result='<table class="bordered"><tr><th colspan="5">Заказ</th><th colspan="4">Исполнение</th></tr>';
+        $result='<table class="bordered"><tr><th colspan="5">Заказ</th><th colspan="2">Оценка</th></tr>';
         $result.='<tr><th>Наименование</th><th>Кол-во</th><th>Ед.изм</th><th>Цена max</th><th>Валюта</th>';
-        $result.='<th>Цена</th><th>Валюта</th><th>Кол-во</th><th>Ед.изм</th></tr>';
+        $result.='<th>Цена</th><th>Валюта</th></tr>';
         $db=DB::connect();
         $sql='select `order_supply`.`id`, `order`.`tovname`,';
         $sql.='sum(`order`.`qt`) as `qt`,`units`.`caption` as `unit`,max(`order`.`cost`) as `cost`,';
@@ -236,7 +227,12 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
             $result.='<tr><td class="tovname">'.$res_i['tovname'].'</td><td  class="qt">'.$res_i['qt'].'</td>';
             $result.='<td class="unit">'.$res_i['unit'].'</td><td class="cost">'.$res_i['cost'].'</td>';
             $result.='<td class="curr">'.$res_i['curr'].'</td>';
-            $result.='<td class="cost"></td><td class="curr"></td><td class="qt"></td><td class="unit"></td></tr>';
+            $result.='<td class="cost"><input type="number" name="data[' . $res_i['id'] . '][cost]" step="any"></td>';
+            $result.='<td class="curr"><select name="data[' . $res_i['id'] . '][curr]">';
+            foreach (self::getCurrency() as $value) {
+                $result .= '<option value="' . $value['id'] . '">' . $value['caption'] . '</option>';
+            }
+            $result.='</select></td></tr>';
         }
         $result.='</table>';
         return $result;
@@ -474,5 +470,35 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         }
         $result.='</table>';
         return $result;
+    }
+
+    private static function getUnits()
+    {
+        $db = DB::connect();
+        $res = $db->query('SELECT * FROM units;');
+        while ($res_i = $res->fetch()) {
+            $unit[] = $res_i;
+        }
+        return $unit;
+    }
+
+    private static function getCurrency()
+    {
+        $db = DB::connect();
+        $res = $db->query('SELECT * FROM currency;');
+        while ($res_i = $res->fetch()) {
+            $cur[] = $res_i;
+        }
+        return $cur;
+    }
+
+    private static function getTerm()
+    {
+        $db = DB::connect();
+                $res = $db->query('SELECT * FROM term;');
+        while ($res_i = $res->fetch()) {
+            $term[] = $res_i;
+        }
+        return $term;
     }
 }

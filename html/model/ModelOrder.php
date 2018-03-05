@@ -120,7 +120,8 @@ class ModelOrder extends Model
         switch ($action){
             case 'main':
                 try{
-                    $data['content']=Provision::createExecTable();
+                    $data['eval']['action']=$_SERVER['REQUEST_URI'].'/eval';
+                    $data['eval']['content']=Provision::createExecTable();
                     $loader= new Twig_Loader_Filesystem($this->data['path']);
                     $twig=new Twig_Environment($loader);
                     $template=$twig->loadTemplate('prov.tmpl');

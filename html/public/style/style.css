@@ -77,6 +77,9 @@ dd {
 	font-style: italic;
 }
 
+input{
+}
+
 input,button,textarea {
 	display: inline-block;
 }
@@ -484,6 +487,11 @@ ul.rightNav li a:hover {
     color:#a12424;
 }
 
+td input{
+	width: 90%;
+	padding: 5px 1px;
+}
+
 td.date,td.qt,td.cost,td.term {
 	width:6.3%;
 }
@@ -569,4 +577,8 @@ input.tabs:checked + label {
 	label {
 		padding: 15px;
 	}
+}
+
+div.alert{
+	background-color: red;
 }
