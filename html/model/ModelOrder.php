@@ -121,7 +121,10 @@ class ModelOrder extends Model
             case 'main':
                 try{
                     $data['eval']['action']=$_SERVER['REQUEST_URI'].'/eval';
-                    $data['eval']['content']=Provision::createExecTable();
+                    $data['eval']['content']=Provision::createExecTable('eval');
+					$data['perf']['action']=$_SERVER['REQUEST_URI'].'/perf';
+                    $data['perf']['content']=Provision::createExecTable('perf');
+					$data['msg']=$this->data['msg'];
                     $loader= new Twig_Loader_Filesystem($this->data['path']);
                     $twig=new Twig_Environment($loader);
                     $template=$twig->loadTemplate('prov.tmpl');
@@ -130,6 +133,21 @@ class ModelOrder extends Model
                     die('ERROR: '.$e->getMessage());
                 }
                 return $this->data;
+				break;
+			case 'eval':
+				if (isset($_POST['data'])){
+					$_SESSION['msg']=Provision::setEvalTable($_POST['data']);
+				}
+				header('Refresh:0;'.$this->returnUrl());
+				exit;
+				break;
+				case 'perf':
+				if (isset($_POST['data'])){
+					$_SESSION['msg']=Provision::setEvalTable($_POST['data']);
+				}
+				header('Refresh:0;'.$this->returnUrl());
+				exit;
+				break;
         }
 
     }
