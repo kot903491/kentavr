@@ -1,3 +1,7 @@
+{% if msg %}
+<h3>{{ msg|raw }}</h3>
+{% endif %}
+
 {% if eval %}
 <input id="tab1" class="tabs" type="radio" name="tabs" checked>
 <label class="tabs"  for="tab1">Оценка</label>
@@ -14,6 +18,16 @@
 <form method="POST" action="{{ eval.action }}">
 
 {{ eval.content|raw }}
+    <button type="submit">Сохранить</button>
+
+</form>
+</section>
+{% endif %}
+{% if perf %}
+<section id="content2" class="tabs">
+<form method="POST" action="{{ perf.action }}">
+
+{{ perf.content|raw }}
     <button type="submit">Сохранить</button>
 
 </form>
