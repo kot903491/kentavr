@@ -176,21 +176,68 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
      *
      * @return string
      * */
-    public static function createExecTable()
+    public static function createExecTable($action)
     {
         $result='';
         $exec=self::getExecId();
-        $dline=self::getExecDeadline($exec);
+        $dline=self::getExecDeadline($exec,$action);
         if ($dline!=null) {
             foreach ($dline as $key => $value) {
                 $result .= '<div class="rowOrder">';
                 $result .= self::createInputLabel($value);
-                $result .= '<div class="colOrderAll">' . self::getExecTable($exec, $value) . '</div>';
+                $result .= '<div class="colOrderAll">' . self::getExecTable($exec, $value,$action) . '</div>';
                 $result .= '</div>';
             }
         }
         return $result;
     }
+	
+	public static function setEvalTable($data)
+	{
+		$res=true;
+		$db=DB::connect();
+		$db->beginTransaction();
+		foreach ($data as $key=>$value){
+			if ($value['cost']!=''){
+				$res=self::setEval($db,$key,$value['cost'],$value['curr']);
+				if ($res!='ok'){
+					$res=false;
+				}
+			}
+		}
+		if ($res){
+			$db->commit();
+			$result='Успешно';
+		}
+		else{
+			$db->rollBack();
+			$result='Что то пошло не так, попробуйте заново';
+            }
+			return $result;
+	}
+	
+	public static function setPerfTable($data)
+	{
+		
+	}
+	
+	private static function setPerf($db,$id,$qt,$unit)
+	{		
+		
+	}	
+	
+	private static function setEval($db,$id,$cost,$curr)
+	{		
+		$sql = 'UPDATE `order_supply` SET `cost`=(?), `curr`=(?) WHERE `id`=(?);';
+		$stmt=$db->prepare($sql);
+		$stmt->execute([$cost,$curr,$id]);
+		$s=$stmt->errorInfo();
+		if ($s[2]==null){
+			return 'ok';
+		}else{
+			return $s[3];
+		}
+	}
 
     private static function getExecId()
     {
@@ -207,8 +254,10 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         }
     }
 
-    private static function getExecTable($exec,$deadline)
+    private static function getExecTable($exec,$deadline,$action)
     {
+		switch($action){
+			case 'eval':
         $result='<table class="bordered"><tr><th colspan="5">Заказ</th><th colspan="2">Оценка</th></tr>';
         $result.='<tr><th>Наименование</th><th>Кол-во</th><th>Ед.изм</th><th>Цена max</th><th>Валюта</th>';
         $result.='<th>Цена</th><th>Валюта</th></tr>';
@@ -219,7 +268,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
         $sql.='inner join `units` on `units`.`id`=`order`.`unit`';
         $sql.='inner join `currency` on `currency`.`id`=`order`.`curr`';
-        $sql.='where `order_supply`.`exec` = (?) and `order`.`deadline`=(?)';
+        $sql.='where `order_supply`.`exec` = (?) and `order`.`deadline`=(?) and (`order_supply`.`cost` IS NULL)';
         $sql.='group by tovname,deadline,curr,unit,id;';
         $stmt=$db->prepare($sql);
         $stmt->execute([$exec,$deadline]);
@@ -235,6 +284,36 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
             $result.='</select></td></tr>';
         }
         $result.='</table>';
+		break;
+		case 'perf':
+        $result='<table class="bordered"><tr><th colspan="6">Заказ</th><th colspan="2">Куплено</th></tr>';
+        $result.='<tr><th>Наименование</th><th>Кол-во</th><th>Ед.изм</th><th>Цена</th><th>Сумма</th><th>Валюта</th>';
+        $result.='<th>Кол-во</th><th>Ед.изм</th></tr>';
+        $db=DB::connect();
+        $sql='select `order_supply`.`id`, `order`.`tovname`,';
+        $sql.='sum(`order`.`qt`) as `qt`,`units`.`caption` as `unit`,`order_supply`.`cost` as `cost`,';
+        $sql.='`currency`.`caption` as `curr` from `order_supply`';
+        $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
+        $sql.='inner join `units` on `units`.`id`=`order`.`unit`';
+        $sql.='inner join `currency` on `currency`.`id`=`order`.`curr`';
+        $sql.='where `order_supply`.`exec` = (?) and `order`.`deadline`=(?) and (`order_supply`.`cost` IS NOT NULL)';
+        $sql.='group by tovname,deadline,curr,unit,id;';
+        $stmt=$db->prepare($sql);
+        $stmt->execute([$exec,$deadline]);
+        while($res_i=$stmt->fetch()){
+            $result.='<tr><td class="tovname">'.$res_i['tovname'].'</td><td  class="qt">'.$res_i['qt'].'</td>';
+            $result.='<td class="unit">'.$res_i['unit'].'</td><td class="cost">'.$res_i['cost'].'</td>';
+            $result.='<td class="cost">'.$res_i['cost']*$res_i['qt'].'</td><td class="curr">'.$res_i['curr'].'</td>';
+            $result.='<td class="qt"><input type="number" name="data[' . $res_i['id'] . '][qt]" step="any"></td>';
+            $result.='<td class="unit"><select name="data[' . $res_i['id'] . '][unit]">';
+            foreach (self::getUnits() as $value) {
+                $result .= '<option value="' . $value['id'] . '">' . $value['caption'] . '</option>';
+            }
+            $result.='</select></td></tr>';
+        }
+        $result.='</table>';
+		break;
+		}
         return $result;
     }
 
@@ -299,19 +378,35 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 
     }
 
-    private static function getExecDeadline($exec)
+    private static function getExecDeadline($exec,$action)
     {
-        $dline=null;
-        $sql='select `order`.`deadline` from `order_supply`';
-        $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
-        $sql.='where `order_supply`.`exec`=(?)';
-        $sql.='group by `deadline`;';
-        $db=DB::connect();
-        $stmt=$db->prepare($sql);
-        $stmt->execute([$exec]);
-        while($res_i=$stmt->fetch()){
-            $dline[]=$res_i['deadline'];
-        }
+        $dline=[];
+		switch($action){
+			case 'eval':
+            $sql='select `order`.`deadline` from `order_supply`';
+            $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
+            $sql.='where `order_supply`.`exec`=(?) and (`order_supply`.`cost` IS NULL)';
+            $sql.='group by `deadline`;';
+            $db=DB::connect();
+            $stmt=$db->prepare($sql);
+            $stmt->execute([$exec]);
+            while($res_i=$stmt->fetch()){
+                $dline[]=$res_i['deadline'];
+            }
+		    break;
+        case 'perf':
+		$sql='select `order`.`deadline` from `order_supply`';
+            $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
+            $sql.='where `order_supply`.`exec`=(?) and (`order_supply`.`cost` IS NOT NULL)';
+            $sql.='group by `deadline`;';
+            $db=DB::connect();
+            $stmt=$db->prepare($sql);
+            $stmt->execute([$exec]);
+            while($res_i=$stmt->fetch()){
+                $dline[]=$res_i['deadline'];
+            }
+		    break;
+		}
         return $dline;
     }
 
