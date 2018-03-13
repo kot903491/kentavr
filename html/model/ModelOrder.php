@@ -143,7 +143,8 @@ class ModelOrder extends Model
 				break;
 				case 'perf':
 				if (isset($_POST['data'])){
-					$_SESSION['msg']=Provision::setEvalTable($_POST['data']);
+					$_SESSION['msg']=Provision::setPerfTable($_POST['data']);
+					break;
 				}
 				header('Refresh:0;'.$this->returnUrl());
 				exit;
