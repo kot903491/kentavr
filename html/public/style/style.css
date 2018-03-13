@@ -161,6 +161,10 @@ div.order select {
 .num{
     width: 6%;
 }
+.perf{
+    width: 2%;
+	text-align:center;
+}
 .unit{
     width: 6%;
 }
