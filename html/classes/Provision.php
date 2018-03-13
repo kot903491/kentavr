@@ -218,19 +218,81 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 	
 	public static function setPerfTable($data)
 	{
+		$result=true;
+		$perf = self::getPerf();
+		//$res[]=$perf;
+		//$res[]=$data;
+		foreach ($data as $key=>$value){
+			if ($value['qt']!=''){
+				$db=DB::connect();
+		        $db->beginTransaction();
+				$count=self::getPerfString($key,'count');
+				switch ($count){
+					case 0:
+					if ($value['qt']==$perf[$key]['qt']){
+						$add=['id'=>$key];
+						$value=array_merge($add,$value);
+						$result=self::setPerf($db,$value,4);
+						break;
+					}
+				}
+			}
+			if ($result){
+			    $db->commit();
+		    }
+		    else{
+			    $db->rollBack();
+		    }
+			var_dump($result);
+			exit;
+		}
 		
 	}
 	
-	private static function setPerf($db,$id,$qt,$unit)
-	{		
-		
+	private static function setPerf($db,$data,$status)
+	{
+		if (!isset($data['rem'])){
+			$data['rem']='';
+		}
+		$sql='INSERT INTO `order_perf` (`id_sup`,`qt`,`unit`,`cost`,`curr`,`rem`,`created_at`) VALUES(?,?,?,?,?,?,?);';
+		$stmt=$db->prepare($sql);
+		$stmt->execute([$data['id'],$data['qt'],$data['unit'],$data['cost'],$data['curr'],$data['rem'],time()]);
+		$s=$stmt->errorInfo();
+		if($s[2]!=null){
+			return false;
+        }
+		$sql='UPDATE `order` SET `status`=(?) WHERE `id`=(?);';
+		$stmt=$db->prepare($sql);
+		$stmt->execute([$status,$data['id']]);
+		$s=$stmt->errorInfo();
+		if($s[2]!=null){
+			return false;
+        }
+		return true;
 	}	
+	
+	private static function getPerf()
+	{
+		$db=DB::connect();
+		$sql='select `order_supply`.`id`, ';
+        $sql.='sum(`order`.`qt`) as `qt`,`order`.`unit` as `unit`';
+        $sql.=' from `order_supply`';
+        $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
+        $sql.='where (`order_supply`.`cost` IS NOT NULL)';
+        $sql.='group by unit,id;';
+		$stmt=$db->prepare($sql);
+		$stmt->execute();
+		while ($res=$stmt->fetch()){
+			$result[$res['id']]=$res;
+		}
+		return $result;
+	}
 	
 	private static function setEval($db,$id,$cost,$curr)
 	{		
-		$sql = 'UPDATE `order_supply` SET `cost`=(?), `curr`=(?) WHERE `id`=(?);';
+		$sql = 'UPDATE `order_supply` SET `cost`=(?), `curr`=(?), `created_at`=(?) WHERE `id`=(?);';
 		$stmt=$db->prepare($sql);
-		$stmt->execute([$cost,$curr,$id]);
+		$stmt->execute([$cost,$curr,time(),$id]);
 		$s=$stmt->errorInfo();
 		if ($s[2]==null){
 			return 'ok';
@@ -286,9 +348,9 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         $result.='</table>';
 		break;
 		case 'perf':
-        $result='<table class="bordered"><tr><th colspan="6">Заказ</th><th colspan="2">Куплено</th></tr>';
+        $result='<table class="bordered"><tr><th colspan="6">Заказ</th><th colspan="6">Куплено</th></tr>';
         $result.='<tr><th>Наименование</th><th>Кол-во</th><th>Ед.изм</th><th>Цена</th><th>Сумма</th><th>Валюта</th>';
-        $result.='<th>Кол-во</th><th>Ед.изм</th></tr>';
+        $result.='<th>Выполнено</th><th>Кол-во</th><th>Ед.изм</th><th>Цена</th><th>Валюта</th><th>V</th></tr>';
         $db=DB::connect();
         $sql='select `order_supply`.`id`, `order`.`tovname`,';
         $sql.='sum(`order`.`qt`) as `qt`,`units`.`caption` as `unit`,`order_supply`.`cost` as `cost`,';
@@ -304,18 +366,58 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
             $result.='<tr><td class="tovname">'.$res_i['tovname'].'</td><td  class="qt">'.$res_i['qt'].'</td>';
             $result.='<td class="unit">'.$res_i['unit'].'</td><td class="cost">'.$res_i['cost'].'</td>';
             $result.='<td class="cost">'.$res_i['cost']*$res_i['qt'].'</td><td class="curr">'.$res_i['curr'].'</td>';
-            $result.='<td class="qt"><input type="number" name="data[' . $res_i['id'] . '][qt]" step="any"></td>';
+            $result.='<td class="qt">'.self::getPerfString($res_i['id'],'string').'</td><td class="qt"><input type="number" name="data[' . $res_i['id'] . '][qt]" step="any"></td>';
             $result.='<td class="unit"><select name="data[' . $res_i['id'] . '][unit]">';
             foreach (self::getUnits() as $value) {
                 $result .= '<option value="' . $value['id'] . '">' . $value['caption'] . '</option>';
             }
-            $result.='</select></td></tr>';
+			$result.='<td class="cost"><input type="number" name="data[' . $res_i['id'] . '][cost]" step="any"></td>';
+            $result.='<td class="curr"><select name="data[' . $res_i['id'] . '][curr]">';
+            foreach (self::getCurrency() as $value) {
+                $result .= '<option value="' . $value['id'] . '">' . $value['caption'] . '</option>';
+            }
+            $result.='</select></td><td class="perf"><input type="checkbox" name="data[' . $res_i['id'] . '][perf]"></td></tr>';
         }
         $result.='</table>';
 		break;
 		}
         return $result;
     }
+	
+	private static function getPerfString($id,$get)
+	{
+		$db=DB::connect();
+	
+		$sql='SELECT sum(`qt`), `units`.`caption` as `unit` from `order_perf ';
+		$sql.='inner join `units` where `units`.`id`=`order_perf`.`unit` ';
+		$sql.='WHERE `order`.`id`=(?) GROUP BY `unit`;';
+		$stmt = $db->prepare($sql);
+		$stmt->execute([$id]);
+		switch($get){
+			case 'string':
+			$result='';
+		    while($res=$stmt->fetch()){
+			    $result.=$res['qt'] . ' ' . $res['unit'] . ';/n';
+		    }
+			break;
+			case 'count':
+			$result=0;
+			while($res=$stmt->fetch()){
+			    $res_i[]=$res;
+		    }
+			if (isset($res_i)){
+				$result=count($res_i);
+			}			
+			break;
+			case 'unit':
+			$result='';
+			while($res=$stmt->fetch()){
+			    $result=$res['unit'];
+		    }
+			break;
+		}
+		return $result;
+	}
 
     private static function createTovTable($value,$key)
     {
@@ -343,7 +445,8 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         return $result;
     }
 
-    public static function getTableDetail($date,$tov,$un){
+    public static function getTableDetail($date,$tov,$un)
+	{
         $db=DB::connect();
         $sql='SELECT `dept`.`dept` as `dept`,sum(`order`.`qt`) as qt,`units`.`caption`as `unit`,MAX(`order`.`cost`) as `cost`,`currency`.`caption` as `curr` from `order`';
         $sql.='inner join `users` on `users`.`id`=`order`.`user`';
