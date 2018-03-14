@@ -221,32 +221,57 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 		$result=true;
 		$perf = self::getPerf();
 		//$res[]=$perf;
-		//$res[]=$data;
+		$result=false;
 		foreach ($data as $key=>$value){
-			if ($value['qt']!=''){
+			if (($value['qt']!='')&&($value['cost']!='')){
+				$status=3;
 				$db=DB::connect();
 		        $db->beginTransaction();
 				$count=self::getPerfString($key,'count');
+				$value['id']=$key;
 				switch ($count){
 					case 0:
-					if ($value['qt']==$perf[$key]['qt']){
-						$add=['id'=>$key];
-						$value=array_merge($add,$value);
-						$result=self::setPerf($db,$value,4);
-						break;
+					if ($value['unit']==$perf[$key]['unit']){
+						if ($value['qt']==$perf[$key]['qt']){
+						    $status=4;
+						}
 					}
+					else{
+						if (isset($value['perf'])){
+							$status=4;
+						}
+					}
+				    break;
+					case 1:
+					$unit=self::getPerfString($key,'unit');
+					if(($unit==$value['unit']) && ($unit==$perf[$key]['unit'])){
+						$qt=self::getPerfString($key,'qt')+$value['qt'];
+						if (qt==$perf[$key]['qt']){
+							$status=4;
+						}
+					}
+					else{
+						if (isset($value['perf'])){
+							$status=4;
+						}
+					}
+					break;
+					case $count>1:
+					if (isset($value['perf'])){
+						$status=4;
+					}					
+					break;
 				}
-			}
-			if ($result){
-			    $db->commit();
-		    }
-		    else{
-			    $db->rollBack();
-		    }
-			var_dump($result);
-			exit;
+				$result=self::setPerf($db,$value,$status);
+				if ($result){
+			        $db->commit();
+		        }
+		        else{
+			        $db->rollBack();
+		        }				
+			}						
 		}
-		
+		return $result;		
 	}
 	
 	private static function setPerf($db,$data,$status)
@@ -261,7 +286,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 		if($s[2]!=null){
 			return false;
         }
-		$sql='UPDATE `order` SET `status`=(?) WHERE `id`=(?);';
+		$sql='UPDATE `order` SET `status`=(?) WHERE `id_sup`=(?);';
 		$stmt=$db->prepare($sql);
 		$stmt->execute([$status,$data['id']]);
 		$s=$stmt->errorInfo();
@@ -358,7 +383,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
         $sql.='inner join `units` on `units`.`id`=`order`.`unit`';
         $sql.='inner join `currency` on `currency`.`id`=`order`.`curr`';
-        $sql.='where `order_supply`.`exec` = (?) and `order`.`deadline`=(?) and (`order_supply`.`cost` IS NOT NULL)';
+        $sql.='where `order`.`status`<>4 and `order_supply`.`exec` = (?) and `order`.`deadline`=(?) and (`order_supply`.`cost` IS NOT NULL)';
         $sql.='group by tovname,deadline,curr,unit,id;';
         $stmt=$db->prepare($sql);
         $stmt->execute([$exec,$deadline]);
@@ -386,18 +411,17 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 	
 	private static function getPerfString($id,$get)
 	{
-		$db=DB::connect();
-	
-		$sql='SELECT sum(`qt`), `units`.`caption` as `unit` from `order_perf ';
-		$sql.='inner join `units` where `units`.`id`=`order_perf`.`unit` ';
-		$sql.='WHERE `order`.`id`=(?) GROUP BY `unit`;';
+		$db=DB::connect();	
+		$sql='SELECT sum(`qt`) as `qt`, `units`.`caption` as `unit` from `order_perf` ';
+		$sql.='inner join `units` on `units`.`id`=`order_perf`.`unit` ';
+		$sql.='WHERE `id_sup`=(?) GROUP BY `unit`;';
 		$stmt = $db->prepare($sql);
 		$stmt->execute([$id]);
 		switch($get){
 			case 'string':
 			$result='';
 		    while($res=$stmt->fetch()){
-			    $result.=$res['qt'] . ' ' . $res['unit'] . ';/n';
+			    $result.=$res['qt'] . ' ' . $res['unit'] . ';'.PHP_EOL;
 		    }
 			break;
 			case 'count':
@@ -414,6 +438,9 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 			while($res=$stmt->fetch()){
 			    $result=$res['unit'];
 		    }
+			break;
+			case 'qt':
+			$result=$res['qt'];
 			break;
 		}
 		return $result;
