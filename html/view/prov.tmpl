@@ -2,16 +2,21 @@
 <h3>{{ msg|raw }}</h3>
 {% endif %}
 
+{% if content %}
+{{ content|raw }}
+{% endif %}
+
+
 {% if eval %}
 <input id="tab1" class="tabs" type="radio" name="tabs" checked>
 <label class="tabs"  for="tab1">Оценка</label>
-{% endif %}
+
 <input id="tab2" class="tabs"  type="radio" name="tabs">
 <label class="tabs"  for="tab2">К исполнению</label>
 
 <input id="tab3" class="tabs"  type="radio" name="tabs">
 <label class="tabs"  for="tab3">Выполнено</label>
-
+{% endif %}
 
 {% if eval %}
 <section id="content1" class="tabs">
