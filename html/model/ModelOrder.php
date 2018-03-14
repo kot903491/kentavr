@@ -144,11 +144,10 @@ class ModelOrder extends Model
 				case 'perf':
 				if (isset($_POST['data'])){
 					$_SESSION['msg']=Provision::setPerfTable($_POST['data']);
+					header('Refresh:0;'.$this->returnUrl());
+					exit;
 					break;
 				}
-				header('Refresh:0;'.$this->returnUrl());
-				exit;
-				break;
         }
 
     }
