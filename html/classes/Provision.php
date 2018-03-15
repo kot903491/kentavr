@@ -219,6 +219,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 	public static function setPerfTable($data)
 	{
 		$result=true;
+		$str='Ничего не заполнено';
 		$perf = self::getPerf();
 		//$res[]=$perf;
 		$result=false;
@@ -265,13 +266,15 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 				$result=self::setPerf($db,$value,$status);
 				if ($result){
 			        $db->commit();
+					$str='Успешно';
 		        }
 		        else{
 			        $db->rollBack();
+					$str='Что то пошло не так, попробуйте заново';
 		        }				
 			}						
 		}
-		return $result;		
+		return $str;		
 	}
 	
 	private static function setPerf($db,$data,$status)
@@ -293,6 +296,15 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 		if($s[2]!=null){
 			return false;
         }
+		if ($status=4){
+			$sql='UPDATE `order_supply` SET `st`=(?) WHERE `id`=(?);';
+		    $stmt=$db->prepare($sql);
+		    $stmt->execute([1,$data['id']]);
+		    $s=$stmt->errorInfo();
+		    if($s[2]!=null){
+			    return false;
+            }
+		}		
 		return true;
 	}	
 	
@@ -421,7 +433,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 			case 'string':
 			$result='';
 		    while($res=$stmt->fetch()){
-			    $result.=$res['qt'] . ' ' . $res['unit'] . ';'.PHP_EOL;
+			    $result.=$res['qt'] . ' ' . $res['unit'] . ';<br>';
 		    }
 			break;
 			case 'count':
@@ -515,7 +527,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
 			case 'eval':
             $sql='select `order`.`deadline` from `order_supply`';
             $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
-            $sql.='where `order_supply`.`exec`=(?) and (`order_supply`.`cost` IS NULL)';
+            $sql.='where `order`.`status`<>4 and `order_supply`.`exec`=(?) and (`order_supply`.`cost` IS NULL)';
             $sql.='group by `deadline`;';
             $db=DB::connect();
             $stmt=$db->prepare($sql);
@@ -527,7 +539,7 @@ where `order`.conf=1 ORDER BY `order`.`datetime` ASC;';
         case 'perf':
 		$sql='select `order`.`deadline` from `order_supply`';
             $sql.='inner join `order` on `order`.`id_sup`=`order_supply`.`id`';
-            $sql.='where `order_supply`.`exec`=(?) and (`order_supply`.`cost` IS NOT NULL)';
+            $sql.='where `order`.`status`<>4 and `order_supply`.`exec`=(?) and (`order_supply`.`cost` IS NOT NULL)';
             $sql.='group by `deadline`;';
             $db=DB::connect();
             $stmt=$db->prepare($sql);
