@@ -120,10 +120,17 @@ class ModelOrder extends Model
         switch ($action){
             case 'main':
                 try{
-                    $data['eval']['action']=$_SERVER['REQUEST_URI'].'/eval';
-                    $data['eval']['content']=Provision::createExecTable('eval');
-					$data['perf']['action']=$_SERVER['REQUEST_URI'].'/perf';
-                    $data['perf']['content']=Provision::createExecTable('perf');
+					$content=Provision::createExecTable('eval');
+					if ($content!=''){
+                        $data['eval']['action']=$_SERVER['REQUEST_URI'].'/eval';
+                        $data['eval']['content']=$content;
+					}
+					$content=Provision::createExecTable('perf');
+					if ($content!=''){
+					    $data['perf']['action']=$_SERVER['REQUEST_URI'].'/perf';
+                        $data['perf']['content']=$content;
+					}
+					$data['button']=true;
 					$data['msg']=$this->data['msg'];
                     $loader= new Twig_Loader_Filesystem($this->data['path']);
                     $twig=new Twig_Environment($loader);
